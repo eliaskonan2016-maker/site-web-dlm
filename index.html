@@ -1,0 +1,1526 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>DLM · Découvre Le Monde — L'œil qui prévient</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Open+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; scroll-behavior: smooth; }
+  body {
+    font-family: 'Open Sans', sans-serif;
+    color: #1D1D1B;
+    background: #fff;
+    overflow-x: hidden;
+  }
+  ::selection { background: #F67F00; color: #fff; }
+
+  /* Reveal-on-scroll */
+  .dlm-reveal {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .dlm-reveal.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Nav link underline */
+  .dlm-nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0;
+    width: 0; height: 2px;
+    background: #F67F00;
+    transition: width 0.3s;
+  }
+  .dlm-nav-link:hover::after { width: 100%; }
+
+  .dlm-cta-mini:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 22px rgba(246,127,0,0.5);
+  }
+
+  .dlm-btn-primary {
+    transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
+  }
+  .dlm-btn-primary:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 14px 40px rgba(246,127,0,0.55);
+    background: #ff8e1a !important;
+  }
+
+  /* Radar sweep */
+  @keyframes radar-sweep {
+    0% { transform: rotate(0deg); opacity: 0; }
+    10% { opacity: 1; }
+    100% { transform: rotate(360deg); opacity: 0; }
+  }
+  .dlm-radar-sweep {
+    animation: radar-sweep 4s linear infinite;
+  }
+
+  /* Ping animation */
+  @keyframes ping {
+    0% { transform: scale(1); opacity: 0.6; }
+    100% { transform: scale(4); opacity: 0; }
+  }
+  .dlm-ping {
+    animation: ping 2.5s ease-out infinite;
+  }
+
+  /* Scroll line indicator */
+  .dlm-scroll-line {
+    width: 1px;
+    height: 40px;
+    background: linear-gradient(to bottom, transparent, #F67F00);
+    position: relative;
+    overflow: hidden;
+  }
+  .dlm-scroll-line::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 12px;
+    background: #fff;
+    animation: scroll-down 2s ease-in-out infinite;
+  }
+  @keyframes scroll-down {
+    0% { transform: translateY(-100%); }
+    100% { transform: translateY(400%); }
+  }
+
+  /* Client card hover */
+  .dlm-client-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 14px 40px rgba(0,0,0,0.08);
+  }
+  .dlm-client-card:hover .dlm-client-underline {
+    transform: scaleX(1);
+  }
+
+  /* Footer */
+  .dlm-footer-link:hover { color: #F67F00 !important; }
+  .dlm-social:hover {
+    border-color: #F67F00 !important;
+    color: #F67F00 !important;
+    background: rgba(246,127,0,0.08);
+  }
+
+  /* Tweaks panel base */
+  .tweaks-panel-card { z-index: 9999; }
+
+  /* Responsive */
+  @media (max-width: 960px) {
+    .dlm-nav-desktop { display: none !important; }
+    .dlm-burger { display: flex !important; }
+    .dlm-services-grid { grid-template-columns: 1fr !important; }
+    .dlm-about-grid { grid-template-columns: 1fr !important; gap: 60px !important; }
+    .dlm-clients-grid { grid-template-columns: repeat(2, 1fr) !important; }
+    .dlm-contact-grid { grid-template-columns: 1fr !important; gap: 48px !important; }
+    .dlm-footer-grid { grid-template-columns: 1fr 1fr !important; gap: 40px !important; }
+  }
+  @media (max-width: 560px) {
+    .dlm-clients-grid { grid-template-columns: 1fr !important; }
+    .dlm-footer-grid { grid-template-columns: 1fr !important; }
+  }
+</style>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+</head>
+<body>
+<div id="root"></div>
+
+<!-- ============================================================ -->
+<!-- TWEAKS PANEL                                                  -->
+<!-- ============================================================ -->
+<script type="text/babel">
+
+const __TWEAKS_STYLE = `
+  .twk-panel{position:fixed;right:16px;bottom:16px;z-index:2147483646;width:280px;
+    max-height:calc(100vh - 32px);display:flex;flex-direction:column;
+    transform:scale(var(--dc-inv-zoom,1));transform-origin:bottom right;
+    background:rgba(250,249,247,.78);color:#29261b;
+    -webkit-backdrop-filter:blur(24px) saturate(160%);backdrop-filter:blur(24px) saturate(160%);
+    border:.5px solid rgba(255,255,255,.6);border-radius:14px;
+    box-shadow:0 1px 0 rgba(255,255,255,.5) inset,0 12px 40px rgba(0,0,0,.18);
+    font:11.5px/1.4 ui-sans-serif,system-ui,-apple-system,sans-serif;overflow:hidden}
+  .twk-hd{display:flex;align-items:center;justify-content:space-between;
+    padding:10px 8px 10px 14px;cursor:move;user-select:none}
+  .twk-hd b{font-size:12px;font-weight:600;letter-spacing:.01em}
+  .twk-x{appearance:none;border:0;background:transparent;color:rgba(41,38,27,.55);
+    width:22px;height:22px;border-radius:6px;cursor:default;font-size:13px;line-height:1}
+  .twk-x:hover{background:rgba(0,0,0,.06);color:#29261b}
+  .twk-body{padding:2px 14px 14px;display:flex;flex-direction:column;gap:10px;
+    overflow-y:auto;overflow-x:hidden;min-height:0;
+    scrollbar-width:thin;scrollbar-color:rgba(0,0,0,.15) transparent}
+  .twk-body::-webkit-scrollbar{width:8px}
+  .twk-body::-webkit-scrollbar-track{background:transparent;margin:2px}
+  .twk-body::-webkit-scrollbar-thumb{background:rgba(0,0,0,.15);border-radius:4px;
+    border:2px solid transparent;background-clip:content-box}
+  .twk-body::-webkit-scrollbar-thumb:hover{background:rgba(0,0,0,.25);
+    border:2px solid transparent;background-clip:content-box}
+  .twk-row{display:flex;flex-direction:column;gap:5px}
+  .twk-row-h{flex-direction:row;align-items:center;justify-content:space-between;gap:10px}
+  .twk-lbl{display:flex;justify-content:space-between;align-items:baseline;
+    color:rgba(41,38,27,.72)}
+  .twk-lbl>span:first-child{font-weight:500}
+  .twk-val{color:rgba(41,38,27,.5);font-variant-numeric:tabular-nums}
+  .twk-sect{font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;
+    color:rgba(41,38,27,.45);padding:10px 0 0}
+  .twk-sect:first-child{padding-top:0}
+  .twk-field{appearance:none;box-sizing:border-box;width:100%;min-width:0;height:26px;padding:0 8px;
+    border:.5px solid rgba(0,0,0,.1);border-radius:7px;
+    background:rgba(255,255,255,.6);color:inherit;font:inherit;outline:none}
+  .twk-field:focus{border-color:rgba(0,0,0,.25);background:rgba(255,255,255,.85)}
+  select.twk-field{padding-right:22px;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path fill='rgba(0,0,0,.5)' d='M0 0h10L5 6z'/></svg>");
+    background-repeat:no-repeat;background-position:right 8px center}
+  .twk-slider{appearance:none;-webkit-appearance:none;width:100%;height:4px;margin:6px 0;
+    border-radius:999px;background:rgba(0,0,0,.12);outline:none}
+  .twk-slider::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;
+    width:14px;height:14px;border-radius:50%;background:#fff;
+    border:.5px solid rgba(0,0,0,.12);box-shadow:0 1px 3px rgba(0,0,0,.2);cursor:default}
+  .twk-slider::-moz-range-thumb{width:14px;height:14px;border-radius:50%;
+    background:#fff;border:.5px solid rgba(0,0,0,.12);box-shadow:0 1px 3px rgba(0,0,0,.2);cursor:default}
+  .twk-seg{position:relative;display:flex;padding:2px;border-radius:8px;
+    background:rgba(0,0,0,.06);user-select:none}
+  .twk-seg-thumb{position:absolute;top:2px;bottom:2px;border-radius:6px;
+    background:rgba(255,255,255,.9);box-shadow:0 1px 2px rgba(0,0,0,.12);
+    transition:left .15s cubic-bezier(.3,.7,.4,1),width .15s}
+  .twk-seg.dragging .twk-seg-thumb{transition:none}
+  .twk-seg button{appearance:none;position:relative;z-index:1;flex:1;border:0;
+    background:transparent;color:inherit;font:inherit;font-weight:500;min-height:22px;
+    border-radius:6px;cursor:default;padding:4px 6px;line-height:1.2;
+    overflow-wrap:anywhere}
+  .twk-toggle{position:relative;width:32px;height:18px;border:0;border-radius:999px;
+    background:rgba(0,0,0,.15);transition:background .15s;cursor:default;padding:0}
+  .twk-toggle[data-on="1"]{background:#34c759}
+  .twk-toggle i{position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;
+    background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.25);transition:transform .15s}
+  .twk-toggle[data-on="1"] i{transform:translateX(14px)}
+`;
+
+function useTweaks(defaults) {
+  const [values, setValues] = React.useState(defaults);
+  const setTweak = React.useCallback((keyOrEdits, val) => {
+    const edits = typeof keyOrEdits === 'object' && keyOrEdits !== null
+      ? keyOrEdits : { [keyOrEdits]: val };
+    setValues((prev) => ({ ...prev, ...edits }));
+    window.parent.postMessage({ type: '__edit_mode_set_keys', edits }, '*');
+    window.dispatchEvent(new CustomEvent('tweakchange', { detail: edits }));
+  }, []);
+  return [values, setTweak];
+}
+
+function TweaksPanel({ title = 'Tweaks', children }) {
+  const [open, setOpen] = React.useState(false);
+  const dragRef = React.useRef(null);
+  const offsetRef = React.useRef({ x: 16, y: 16 });
+  const PAD = 16;
+
+  const clampToViewport = React.useCallback(() => {
+    const panel = dragRef.current;
+    if (!panel) return;
+    const w = panel.offsetWidth, h = panel.offsetHeight;
+    const maxRight = Math.max(PAD, window.innerWidth - w - PAD);
+    const maxBottom = Math.max(PAD, window.innerHeight - h - PAD);
+    offsetRef.current = {
+      x: Math.min(maxRight, Math.max(PAD, offsetRef.current.x)),
+      y: Math.min(maxBottom, Math.max(PAD, offsetRef.current.y)),
+    };
+    panel.style.right = offsetRef.current.x + 'px';
+    panel.style.bottom = offsetRef.current.y + 'px';
+  }, []);
+
+  React.useEffect(() => {
+    if (!open) return;
+    clampToViewport();
+    if (typeof ResizeObserver === 'undefined') {
+      window.addEventListener('resize', clampToViewport);
+      return () => window.removeEventListener('resize', clampToViewport);
+    }
+    const ro = new ResizeObserver(clampToViewport);
+    ro.observe(document.documentElement);
+    return () => ro.disconnect();
+  }, [open, clampToViewport]);
+
+  React.useEffect(() => {
+    const onMsg = (e) => {
+      const t = e?.data?.type;
+      if (t === '__activate_edit_mode') setOpen(true);
+      else if (t === '__deactivate_edit_mode') setOpen(false);
+    };
+    window.addEventListener('message', onMsg);
+    window.parent.postMessage({ type: '__edit_mode_available' }, '*');
+    return () => window.removeEventListener('message', onMsg);
+  }, []);
+
+  const dismiss = () => {
+    setOpen(false);
+    window.parent.postMessage({ type: '__edit_mode_dismissed' }, '*');
+  };
+
+  const onDragStart = (e) => {
+    const panel = dragRef.current;
+    if (!panel) return;
+    const r = panel.getBoundingClientRect();
+    const sx = e.clientX, sy = e.clientY;
+    const startRight = window.innerWidth - r.right;
+    const startBottom = window.innerHeight - r.bottom;
+    const move = (ev) => {
+      offsetRef.current = {
+        x: startRight - (ev.clientX - sx),
+        y: startBottom - (ev.clientY - sy),
+      };
+      clampToViewport();
+    };
+    const up = () => {
+      window.removeEventListener('mousemove', move);
+      window.removeEventListener('mouseup', up);
+    };
+    window.addEventListener('mousemove', move);
+    window.addEventListener('mouseup', up);
+  };
+
+  if (!open) return null;
+  return (
+    <>
+      <style>{__TWEAKS_STYLE}</style>
+      <div ref={dragRef} className="twk-panel" data-omelette-chrome=""
+           style={{ right: offsetRef.current.x, bottom: offsetRef.current.y }}>
+        <div className="twk-hd" onMouseDown={onDragStart}>
+          <b>{title}</b>
+          <button className="twk-x" aria-label="Close tweaks"
+                  onMouseDown={(e) => e.stopPropagation()}
+                  onClick={dismiss}>✕</button>
+        </div>
+        <div className="twk-body">
+          {children}
+        </div>
+      </div>
+    </>
+  );
+}
+
+function TweakSection({ label, children }) {
+  return (
+    <>
+      <div className="twk-sect">{label}</div>
+      {children}
+    </>
+  );
+}
+
+function TweakRow({ label, value, children, inline = false }) {
+  return (
+    <div className={inline ? 'twk-row twk-row-h' : 'twk-row'}>
+      <div className="twk-lbl">
+        <span>{label}</span>
+        {value != null && <span className="twk-val">{value}</span>}
+      </div>
+      {children}
+    </div>
+  );
+}
+
+function TweakRadio({ label, value, options, onChange }) {
+  const trackRef = React.useRef(null);
+  const [dragging, setDragging] = React.useState(false);
+  const valueRef = React.useRef(value);
+  valueRef.current = value;
+
+  const labelLen = (o) => String(typeof o === 'object' ? o.label : o).length;
+  const maxLen = options.reduce((m, o) => Math.max(m, labelLen(o)), 0);
+  const fitsAsSegments = maxLen <= ({ 2: 16, 3: 10 }[options.length] ?? 0);
+
+  if (!fitsAsSegments) {
+    return (
+      <TweakRow label={label}>
+        <select className="twk-field" value={value} onChange={(e) => onChange(e.target.value)}>
+          {options.map((o) => {
+            const v = typeof o === 'object' ? o.value : o;
+            const l = typeof o === 'object' ? o.label : o;
+            return <option key={v} value={v}>{l}</option>;
+          })}
+        </select>
+      </TweakRow>
+    );
+  }
+
+  const opts = options.map((o) => (typeof o === 'object' ? o : { value: o, label: o }));
+  const idx = Math.max(0, opts.findIndex((o) => o.value === value));
+  const n = opts.length;
+
+  const segAt = (clientX) => {
+    const r = trackRef.current.getBoundingClientRect();
+    const inner = r.width - 4;
+    const i = Math.floor(((clientX - r.left - 2) / inner) * n);
+    return opts[Math.max(0, Math.min(n - 1, i))].value;
+  };
+
+  const onPointerDown = (e) => {
+    setDragging(true);
+    const v0 = segAt(e.clientX);
+    if (v0 !== valueRef.current) onChange(v0);
+    const move = (ev) => {
+      if (!trackRef.current) return;
+      const v = segAt(ev.clientX);
+      if (v !== valueRef.current) onChange(v);
+    };
+    const up = () => {
+      setDragging(false);
+      window.removeEventListener('pointermove', move);
+      window.removeEventListener('pointerup', up);
+    };
+    window.addEventListener('pointermove', move);
+    window.addEventListener('pointerup', up);
+  };
+
+  return (
+    <TweakRow label={label}>
+      <div ref={trackRef} role="radiogroup" onPointerDown={onPointerDown}
+           className={dragging ? 'twk-seg dragging' : 'twk-seg'}>
+        <div className="twk-seg-thumb"
+             style={{ left: `calc(2px + ${idx} * (100% - 4px) / ${n})`,
+                      width: `calc((100% - 4px) / ${n})` }} />
+        {opts.map((o) => (
+          <button key={o.value} type="button" role="radio" aria-checked={o.value === value}>
+            {o.label}
+          </button>
+        ))}
+      </div>
+    </TweakRow>
+  );
+}
+
+Object.assign(window, {
+  useTweaks, TweaksPanel, TweakSection, TweakRow, TweakRadio,
+});
+</script>
+
+<!-- ============================================================ -->
+<!-- COMPONENTS                                                    -->
+<!-- ============================================================ -->
+<script type="text/babel">
+
+const DLM = {
+  orange: '#F67F00',
+  green: '#009F5F',
+  greenDeep: '#006E42',
+  greenDeeper: '#004D2D',
+  gray: '#878787',
+  black: '#1D1D1B',
+  white: '#FFFFFF',
+};
+
+function DLMLogo({ variant = 'light', size = 1 }) {
+  const fg = variant === 'light' ? '#FFFFFF' : DLM.black;
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 10 * size }}>
+      <svg width={42 * size} height={42 * size} viewBox="0 0 42 42" fill="none">
+        <circle cx="21" cy="21" r="19.5" stroke={DLM.orange} strokeWidth="2.5" fill="none" />
+        <circle cx="21" cy="21" r="11" fill={DLM.green} />
+        <circle cx="21" cy="21" r="5" fill={fg} />
+        <circle cx="24" cy="18" r="1.8" fill="#FFFFFF" opacity="0.9" />
+        <path d="M 8 13 Q 21 4, 34 13" stroke={DLM.orange} strokeWidth="2" fill="none" strokeLinecap="round" />
+      </svg>
+      <div style={{ lineHeight: 1, display: 'flex', flexDirection: 'column', gap: 2 }}>
+        <span style={{
+          fontFamily: 'Montserrat, sans-serif',
+          fontWeight: 800,
+          fontSize: 20 * size,
+          color: fg,
+          letterSpacing: '0.5px',
+        }}>DLM</span>
+        <span style={{
+          fontFamily: 'Open Sans, sans-serif',
+          fontWeight: 600,
+          fontSize: 9 * size,
+          color: variant === 'light' ? 'rgba(255,255,255,0.7)' : DLM.gray,
+          letterSpacing: '1.2px',
+          textTransform: 'uppercase',
+        }}>Découvre Le Monde</span>
+      </div>
+    </div>
+  );
+}
+
+function Header({ scrolled }) {
+  const [open, setOpen] = React.useState(false);
+  const links = [
+    { label: 'Accueil', href: '#hero' },
+    { label: 'Services', href: '#services' },
+    { label: 'À propos', href: '#about' },
+    { label: 'Contact', href: '#contact' },
+  ];
+  return (
+    <header style={{
+      position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100,
+      padding: scrolled ? '14px 6%' : '22px 6%',
+      background: scrolled ? 'rgba(0, 77, 45, 0.95)' : 'transparent',
+      backdropFilter: scrolled ? 'blur(12px)' : 'none',
+      borderBottom: scrolled ? '1px solid rgba(255,255,255,0.08)' : '1px solid transparent',
+      display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+      transition: 'all 0.3s ease',
+    }}>
+      <a href="#hero" style={{ textDecoration: 'none' }}>
+        <DLMLogo variant="light" />
+      </a>
+      <nav className="dlm-nav-desktop" style={{ display: 'flex', alignItems: 'center', gap: 36 }}>
+        {links.map(l => (
+          <a key={l.href} href={l.href} style={{
+            color: '#fff', textDecoration: 'none',
+            fontFamily: 'Open Sans, sans-serif',
+            fontWeight: 600, fontSize: 15,
+            letterSpacing: '0.3px',
+            position: 'relative',
+            padding: '6px 0',
+          }} className="dlm-nav-link">{l.label}</a>
+        ))}
+        <a href="#contact" style={{
+          background: DLM.orange,
+          color: '#fff',
+          padding: '11px 22px',
+          borderRadius: 4,
+          fontFamily: 'Montserrat, sans-serif',
+          fontWeight: 700,
+          fontSize: 14,
+          textDecoration: 'none',
+          letterSpacing: '0.5px',
+          boxShadow: '0 4px 14px rgba(246,127,0,0.35)',
+          transition: 'transform 0.2s, box-shadow 0.2s',
+        }} className="dlm-cta-mini">Demander un devis</a>
+      </nav>
+      <button className="dlm-burger" onClick={() => setOpen(!open)} style={{
+        background: 'transparent', border: 'none', color: '#fff',
+        display: 'none', cursor: 'pointer', padding: 8,
+      }}>
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          {open ? <path d="M18 6L6 18M6 6l12 12" /> : <><path d="M3 6h18" /><path d="M3 12h18" /><path d="M3 18h18" /></>}
+        </svg>
+      </button>
+      {open && (
+        <div style={{
+          position: 'absolute', top: '100%', left: 0, right: 0,
+          background: DLM.greenDeeper,
+          padding: '20px 6%',
+          display: 'flex', flexDirection: 'column', gap: 16,
+          borderTop: '1px solid rgba(255,255,255,0.1)',
+        }}>
+          {links.map(l => (
+            <a key={l.href} href={l.href} onClick={() => setOpen(false)} style={{
+              color: '#fff', textDecoration: 'none',
+              fontFamily: 'Open Sans, sans-serif', fontWeight: 600, fontSize: 16,
+            }}>{l.label}</a>
+          ))}
+        </div>
+      )}
+    </header>
+  );
+}
+
+function HeroBackdrop({ variant }) {
+  if (variant === 'radar') {
+    return (
+      <svg width="100%" height="100%" viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice"
+        style={{ position: 'absolute', inset: 0, opacity: 0.55 }}>
+        <defs>
+          <radialGradient id="rgrad" cx="78%" cy="42%" r="55%">
+            <stop offset="0%" stopColor={DLM.green} stopOpacity="0.45" />
+            <stop offset="100%" stopColor={DLM.greenDeep} stopOpacity="0" />
+          </radialGradient>
+          <linearGradient id="sweep" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor={DLM.orange} stopOpacity="0" />
+            <stop offset="100%" stopColor={DLM.orange} stopOpacity="0.6" />
+          </linearGradient>
+        </defs>
+        <rect width="1200" height="800" fill="url(#rgrad)" />
+        {[80, 160, 260, 380, 520].map((r, i) => (
+          <circle key={i} cx="950" cy="380" r={r}
+            stroke={i === 2 ? DLM.orange : '#fff'} strokeOpacity={i === 2 ? 0.35 : 0.12}
+            strokeWidth={i === 2 ? 1.5 : 1} fill="none" strokeDasharray={i % 2 === 0 ? '4 6' : ''} />
+        ))}
+        <line x1="950" y1="50" x2="950" y2="710" stroke="#fff" strokeOpacity="0.08" strokeWidth="1" />
+        <line x1="380" y1="380" x2="1200" y2="380" stroke="#fff" strokeOpacity="0.08" strokeWidth="1" />
+        <line x1="950" y1="380" x2="1350" y2="200" stroke="url(#sweep)" strokeWidth="2" className="dlm-radar-sweep" style={{ transformOrigin: '950px 380px' }} />
+        <circle cx="950" cy="380" r="14" fill={DLM.orange} />
+        <circle cx="950" cy="380" r="6" fill="#fff" />
+        <g opacity="0.08" stroke="#fff" strokeWidth="1">
+          {[...Array(8)].map((_, i) => <line key={'h'+i} x1="0" y1={i * 60 + 100} x2="700" y2={i * 60 + 100} />)}
+          {[...Array(10)].map((_, i) => <line key={'v'+i} x1={i * 70} y1="100" x2={i * 70} y2="700" />)}
+        </g>
+        {[[150, 220], [320, 480], [580, 180], [200, 620], [480, 340]].map(([x, y], i) => (
+          <g key={i}>
+            <circle cx={x} cy={y} r="3" fill={DLM.orange} />
+            <circle cx={x} cy={y} r="3" fill="none" stroke={DLM.orange} strokeOpacity="0.5" strokeWidth="1" className="dlm-ping" style={{ transformOrigin: `${x}px ${y}px`, animationDelay: `${i * 0.6}s` }} />
+          </g>
+        ))}
+      </svg>
+    );
+  }
+  if (variant === 'globe') {
+    return (
+      <svg width="100%" height="100%" viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice"
+        style={{ position: 'absolute', inset: 0, opacity: 0.6 }}>
+        <defs>
+          <radialGradient id="ggrad" cx="75%" cy="50%" r="45%">
+            <stop offset="0%" stopColor={DLM.green} stopOpacity="0.5" />
+            <stop offset="100%" stopColor={DLM.greenDeep} stopOpacity="0" />
+          </radialGradient>
+        </defs>
+        <rect width="1200" height="800" fill="url(#ggrad)" />
+        <g transform="translate(900, 400)" stroke="#fff" fill="none" strokeWidth="1">
+          {[-240, -180, -120, -60, 0, 60, 120, 180, 240].map((y, i) => {
+            const r = Math.sqrt(Math.max(0, 280*280 - y*y));
+            return <ellipse key={'lat'+i} cx="0" cy={y} rx={r} ry={r * 0.18} strokeOpacity={i === 4 ? 0.4 : 0.15} />;
+          })}
+          {[0.2, 0.4, 0.6, 0.8, 1.0].map((s, i) => (
+            <ellipse key={'lon'+i} cx="0" cy="0" rx={280 * s} ry="280" strokeOpacity="0.15" />
+          ))}
+          <circle cx="0" cy="0" r="280" stroke={DLM.orange} strokeOpacity="0.4" strokeWidth="1.5" />
+          {[[120, -80], [-160, 40], [60, 180], [-80, -200], [200, 100]].map(([x, y], i) => (
+            <g key={i}>
+              <circle cx={x} cy={y} r="4" fill={DLM.orange} />
+              <circle cx={x} cy={y} r="4" fill="none" stroke={DLM.orange} strokeOpacity="0.4" strokeWidth="1" className="dlm-ping" style={{ transformOrigin: `${x}px ${y}px`, animationDelay: `${i * 0.5}s` }} />
+            </g>
+          ))}
+        </g>
+        <g opacity="0.1" stroke="#fff" strokeWidth="1">
+          {[...Array(12)].map((_, i) => <line key={i} x1="0" y1={i * 70} x2="500" y2={i * 70} />)}
+        </g>
+      </svg>
+    );
+  }
+  return (
+    <svg width="100%" height="100%" viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice"
+      style={{ position: 'absolute', inset: 0, opacity: 0.7 }}>
+      <defs>
+        <pattern id="dotgrid" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
+          <circle cx="2" cy="2" r="1.2" fill="#fff" opacity="0.2" />
+        </pattern>
+        <radialGradient id="grad3" cx="80%" cy="50%" r="50%">
+          <stop offset="0%" stopColor={DLM.orange} stopOpacity="0.18" />
+          <stop offset="100%" stopColor={DLM.greenDeep} stopOpacity="0" />
+        </radialGradient>
+      </defs>
+      <rect width="1200" height="800" fill="url(#dotgrid)" />
+      <rect width="1200" height="800" fill="url(#grad3)" />
+      <g stroke={DLM.orange} strokeWidth="1.5" opacity="0.4">
+        <line x1="0" y1="600" x2="400" y2="400" />
+        <line x1="800" y1="800" x2="1200" y2="600" />
+      </g>
+      <g stroke="#fff" strokeWidth="1" opacity="0.1">
+        <line x1="0" y1="100" x2="1200" y2="100" />
+        <line x1="0" y1="700" x2="1200" y2="700" />
+      </g>
+    </svg>
+  );
+}
+
+function Hero({ bgVariant }) {
+  return (
+    <section id="hero" style={{
+      position: 'relative',
+      minHeight: '100vh',
+      background: `linear-gradient(135deg, ${DLM.greenDeeper} 0%, ${DLM.greenDeep} 60%, #015236 100%)`,
+      color: '#fff',
+      display: 'flex', alignItems: 'center',
+      overflow: 'hidden',
+      padding: '120px 6% 80px',
+    }}>
+      <HeroBackdrop variant={bgVariant} />
+      <div style={{ position: 'relative', zIndex: 2, maxWidth: 760 }}>
+        <div className="dlm-reveal" style={{
+          display: 'inline-flex', alignItems: 'center', gap: 10,
+          padding: '8px 16px',
+          background: 'rgba(246,127,0,0.15)',
+          border: '1px solid rgba(246,127,0,0.4)',
+          borderRadius: 100,
+          marginBottom: 28,
+        }}>
+          <span style={{ width: 8, height: 8, borderRadius: '50%', background: DLM.orange, boxShadow: `0 0 10px ${DLM.orange}` }} />
+          <span style={{ fontFamily: 'Open Sans, sans-serif', fontSize: 13, fontWeight: 600, letterSpacing: '1.5px', textTransform: 'uppercase' }}>
+            Abidjan · Côte d'Ivoire
+          </span>
+        </div>
+        <h1 className="dlm-reveal" style={{
+          fontFamily: 'Montserrat, sans-serif',
+          fontWeight: 800,
+          fontSize: 'clamp(48px, 7vw, 92px)',
+          lineHeight: 0.98,
+          margin: '0 0 24px',
+          letterSpacing: '-2px',
+          textWrap: 'balance',
+        }}>
+          L'œil <span style={{ color: DLM.orange, fontStyle: 'italic', fontWeight: 800 }}>qui prévient</span>.
+        </h1>
+        <p className="dlm-reveal" style={{
+          fontFamily: 'Open Sans, sans-serif',
+          fontSize: 'clamp(17px, 1.4vw, 21px)',
+          lineHeight: 1.55,
+          maxWidth: 560,
+          margin: '0 0 40px',
+          color: 'rgba(255,255,255,0.85)',
+        }}>
+          Production audiovisuelle et communication visuelle au service de la prévention des risques professionnels.
+        </p>
+        <div className="dlm-reveal" style={{ display: 'flex', gap: 16, flexWrap: 'wrap', alignItems: 'center' }}>
+          <a href="#contact" className="dlm-btn-primary" style={{
+            background: DLM.orange,
+            color: '#fff',
+            padding: '18px 32px',
+            borderRadius: 4,
+            fontFamily: 'Montserrat, sans-serif',
+            fontWeight: 700,
+            fontSize: 15,
+            letterSpacing: '0.5px',
+            textTransform: 'uppercase',
+            textDecoration: 'none',
+            display: 'inline-flex', alignItems: 'center', gap: 10,
+            boxShadow: '0 10px 30px rgba(246,127,0,0.4)',
+          }}>
+            Demander un devis
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+              <path d="M5 12h14M13 6l6 6-6 6" />
+            </svg>
+          </a>
+          <a href="#services" style={{
+            color: '#fff',
+            padding: '18px 24px',
+            fontFamily: 'Montserrat, sans-serif',
+            fontWeight: 600,
+            fontSize: 14,
+            letterSpacing: '0.5px',
+            textTransform: 'uppercase',
+            textDecoration: 'none',
+            display: 'inline-flex', alignItems: 'center', gap: 10,
+            borderBottom: '1px solid rgba(255,255,255,0.3)',
+          }}>
+            Voir nos prestations
+          </a>
+        </div>
+
+        <div className="dlm-reveal" style={{
+          marginTop: 80,
+          display: 'flex', gap: 48, flexWrap: 'wrap',
+          paddingTop: 32,
+          borderTop: '1px solid rgba(255,255,255,0.15)',
+          maxWidth: 640,
+        }}>
+          {[
+            { v: '6', l: 'prestations sur mesure' },
+            { v: '100%', l: 'production locale' },
+            { v: '4', l: "secteurs d'intervention" },
+          ].map((s, i) => (
+            <div key={i}>
+              <div style={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 800, fontSize: 32, color: DLM.orange, lineHeight: 1 }}>{s.v}</div>
+              <div style={{ fontFamily: 'Open Sans, sans-serif', fontSize: 13, color: 'rgba(255,255,255,0.7)', marginTop: 6, maxWidth: 130, lineHeight: 1.3 }}>{s.l}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div style={{
+        position: 'absolute', bottom: 32, left: '50%', transform: 'translateX(-50%)',
+        color: 'rgba(255,255,255,0.5)', fontSize: 11,
+        fontFamily: 'Open Sans, sans-serif', letterSpacing: '2px',
+        textTransform: 'uppercase',
+        display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8,
+      }}>
+        Défiler
+        <div className="dlm-scroll-line" />
+      </div>
+    </section>
+  );
+}
+
+const ServiceIcons = {
+  video: (
+    <svg width="32" height="32" viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="2" y="8" width="18" height="16" rx="2" />
+      <path d="M20 13l8-4v14l-8-4z" />
+      <circle cx="11" cy="16" r="3" fill="currentColor" stroke="none" />
+    </svg>
+  ),
+  film: (
+    <svg width="32" height="32" viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="5" width="26" height="22" rx="2" />
+      <path d="M3 11h26M3 21h26M9 5v22M23 5v22" />
+      <circle cx="6" cy="8" r="0.8" fill="currentColor" />
+      <circle cx="6" cy="24" r="0.8" fill="currentColor" />
+      <circle cx="26" cy="8" r="0.8" fill="currentColor" />
+      <circle cx="26" cy="24" r="0.8" fill="currentColor" />
+    </svg>
+  ),
+  shield: (
+    <svg width="32" height="32" viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M16 3l11 4v9c0 7-5 12-11 13-6-1-11-6-11-13V7z" />
+      <path d="M11 16l3.5 3.5L21 13" />
+    </svg>
+  ),
+  poster: (
+    <svg width="32" height="32" viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="5" y="3" width="22" height="26" rx="1.5" />
+      <path d="M10 9h12M10 14h12M10 19h8" />
+      <circle cx="22" cy="22" r="3" fill="currentColor" stroke="none" opacity="0.8" />
+    </svg>
+  ),
+  pictogram: (
+    <svg width="32" height="32" viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M16 4l13 23H3z" />
+      <path d="M16 13v7M16 23v0.5" strokeWidth="2.5" />
+    </svg>
+  ),
+  billboard: (
+    <svg width="32" height="32" viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="5" width="26" height="14" rx="1.5" />
+      <path d="M9 19v9M23 19v9M9 28h2M21 28h2" />
+      <path d="M7 10l5 4M19 14l6-5" />
+    </svg>
+  ),
+};
+
+function SectionHeader({ eyebrow, title, desc, align = 'left', invert = false }) {
+  return (
+    <div className="dlm-reveal" style={{
+      maxWidth: 760,
+      margin: align === 'center' ? '0 auto' : '0',
+      textAlign: align,
+    }}>
+      <div style={{
+        display: 'inline-flex', alignItems: 'center', gap: 12,
+        marginBottom: 20,
+      }}>
+        <span style={{ width: 32, height: 2, background: DLM.orange }} />
+        <span style={{
+          fontFamily: 'Montserrat, sans-serif',
+          fontWeight: 700, fontSize: 13,
+          color: invert ? DLM.orange : DLM.green,
+          letterSpacing: '3px', textTransform: 'uppercase',
+        }}>{eyebrow}</span>
+      </div>
+      <h2 style={{
+        fontFamily: 'Montserrat, sans-serif',
+        fontWeight: 800,
+        fontSize: 'clamp(34px, 4.2vw, 54px)',
+        lineHeight: 1.05,
+        margin: '0 0 20px',
+        letterSpacing: '-1.2px',
+        color: invert ? '#fff' : DLM.black,
+        textWrap: 'balance',
+      }}>{title}</h2>
+      {desc && (
+        <p style={{
+          fontFamily: 'Open Sans, sans-serif',
+          fontSize: 17, lineHeight: 1.6,
+          color: invert ? 'rgba(255,255,255,0.8)' : DLM.gray,
+          margin: 0,
+          maxWidth: 600,
+        }}>{desc}</p>
+      )}
+    </div>
+  );
+}
+
+function ServiceCard({ icon, title, desc, n, index }) {
+  const [hover, setHover] = React.useState(false);
+  const col = index % 3;
+  const row = Math.floor(index / 3);
+  return (
+    <div
+      className="dlm-reveal"
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
+      style={{
+        padding: '48px 36px 40px',
+        background: hover ? DLM.greenDeep : '#fff',
+        color: hover ? '#fff' : DLM.black,
+        borderRight: col < 2 ? `1px solid ${DLM.black}10` : 'none',
+        borderBottom: row < 1 ? `1px solid ${DLM.black}10` : 'none',
+        position: 'relative',
+        cursor: 'pointer',
+        transition: 'background 0.4s ease, color 0.4s ease',
+        minHeight: 280,
+        display: 'flex', flexDirection: 'column',
+      }}
+    >
+      <div style={{
+        position: 'absolute', top: 20, right: 24,
+        fontFamily: 'Montserrat, sans-serif', fontWeight: 700, fontSize: 13,
+        color: hover ? 'rgba(255,255,255,0.4)' : DLM.gray,
+        letterSpacing: '2px',
+      }}>{n}</div>
+
+      <div style={{
+        width: 56, height: 56, borderRadius: 4,
+        background: hover ? DLM.orange : `${DLM.green}15`,
+        color: hover ? '#fff' : DLM.green,
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        marginBottom: 24,
+        transition: 'all 0.3s',
+      }}>
+        {ServiceIcons[icon]}
+      </div>
+
+      <h3 style={{
+        fontFamily: 'Montserrat, sans-serif',
+        fontWeight: 700,
+        fontSize: 20,
+        lineHeight: 1.2,
+        margin: '0 0 12px',
+        letterSpacing: '-0.3px',
+      }}>{title}</h3>
+
+      <p style={{
+        fontFamily: 'Open Sans, sans-serif',
+        fontSize: 15,
+        lineHeight: 1.55,
+        color: hover ? 'rgba(255,255,255,0.85)' : DLM.gray,
+        margin: 0,
+        flex: 1,
+      }}>{desc}</p>
+
+      <div style={{
+        marginTop: 24,
+        display: 'inline-flex', alignItems: 'center', gap: 8,
+        fontFamily: 'Montserrat, sans-serif', fontWeight: 600, fontSize: 12,
+        letterSpacing: '1px', textTransform: 'uppercase',
+        color: hover ? DLM.orange : DLM.green,
+        transition: 'all 0.3s',
+      }}>
+        En savoir plus
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"
+          style={{ transform: hover ? 'translateX(4px)' : 'translateX(0)', transition: 'transform 0.3s' }}>
+          <path d="M5 12h14M13 6l6 6-6 6" />
+        </svg>
+      </div>
+    </div>
+  );
+}
+
+function Services() {
+  const services = [
+    { icon: 'video', title: 'Vidéos de sensibilisation', desc: 'Messages forts en images pour mobiliser vos équipes sur les risques.', n: '01' },
+    { icon: 'film', title: 'Films documentaires', desc: 'Reportages de terrain pour témoigner et faire évoluer les pratiques.', n: '02' },
+    { icon: 'shield', title: 'Conseil prévention & sécurité', desc: 'Stratégie de communication adaptée à votre culture sécurité.', n: '03' },
+    { icon: 'poster', title: 'Affiches de sensibilisation', desc: 'Visuels percutants pour vos campagnes internes et chantiers.', n: '04' },
+    { icon: 'pictogram', title: 'Pictogrammes de sécurité', desc: 'Signalétique claire, normée et adaptée à vos environnements.', n: '05' },
+    { icon: 'billboard', title: 'Affiches publicitaires', desc: 'Communication grand public à fort impact visuel.', n: '06' },
+  ];
+  return (
+    <section id="services" style={{
+      padding: '120px 6%',
+      background: '#fafaf8',
+      position: 'relative',
+    }}>
+      <div style={{ maxWidth: 1280, margin: '0 auto' }}>
+        <SectionHeader
+          eyebrow="Nos prestations"
+          title={<>Six services pour <span style={{ color: DLM.orange }}>prévenir</span>, sensibiliser et convaincre.</>}
+          desc="De la stratégie au film fini, nous concevons des contenus qui font baisser les accidents et changent durablement les comportements."
+        />
+        <div className="dlm-services-grid" style={{
+          marginTop: 64,
+          display: 'grid',
+          gridTemplateColumns: 'repeat(3, 1fr)',
+          gap: 0,
+          border: `1px solid ${DLM.black}10`,
+          background: '#fff',
+        }}>
+          {services.map((s, i) => (
+            <ServiceCard key={i} {...s} index={i} />
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function AboutVisual() {
+  return (
+    <div className="dlm-reveal" style={{
+      position: 'relative',
+      aspectRatio: '4 / 5',
+      width: '100%',
+    }}>
+      <div style={{
+        position: 'absolute', inset: '20px -20px -20px 20px',
+        border: `2px solid ${DLM.orange}`,
+        zIndex: 0,
+      }} />
+      <div style={{
+        position: 'relative',
+        width: '100%', height: '100%',
+        background: `linear-gradient(135deg, ${DLM.greenDeep}, ${DLM.green})`,
+        overflow: 'hidden',
+        zIndex: 1,
+      }}>
+        <svg width="100%" height="100%" viewBox="0 0 400 500" preserveAspectRatio="xMidYMid slice">
+          <defs>
+            <linearGradient id="aboutgrad" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stopColor="#fff" stopOpacity="0.15" />
+              <stop offset="100%" stopColor="#fff" stopOpacity="0" />
+            </linearGradient>
+          </defs>
+          <rect width="400" height="500" fill="url(#aboutgrad)" />
+          <g transform="translate(200, 220)">
+            <rect x="-90" y="-50" width="180" height="100" rx="6" fill={DLM.black} />
+            <rect x="-80" y="-40" width="100" height="80" rx="3" fill={DLM.greenDeeper} />
+            <circle cx="-30" cy="0" r="22" fill={DLM.black} stroke={DLM.orange} strokeWidth="3" />
+            <circle cx="-30" cy="0" r="12" fill={DLM.greenDeeper} />
+            <circle cx="-26" cy="-4" r="3" fill="#fff" opacity="0.8" />
+            <circle cx="-30" cy="0" r="18" fill="none" stroke="#fff" strokeOpacity="0.3" strokeWidth="0.5" />
+            <rect x="40" y="-65" width="30" height="15" rx="2" fill={DLM.black} />
+            <rect x="-20" y="-58" width="8" height="8" rx="1" fill={DLM.orange} />
+            <path d="M -50 50 L -110 200 M 0 50 L 0 200 M 50 50 L 110 200" stroke={DLM.black} strokeWidth="6" strokeLinecap="round" />
+          </g>
+          <rect x="0" y="430" width="400" height="70" fill="rgba(0,0,0,0.25)" />
+          <ellipse cx="200" cy="100" rx="80" ry="30" fill={DLM.orange} opacity="0.15" />
+        </svg>
+
+        <div style={{
+          position: 'absolute', bottom: 24, left: 24, right: 24,
+          background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(12px)',
+          padding: '18px 22px',
+          borderLeft: `3px solid ${DLM.orange}`,
+          color: '#fff',
+        }}>
+          <div style={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 700, fontSize: 13, letterSpacing: '2px', textTransform: 'uppercase', color: DLM.orange, marginBottom: 6 }}>
+            En tournage
+          </div>
+          <div style={{ fontFamily: 'Open Sans, sans-serif', fontSize: 14, lineHeight: 1.4, opacity: 0.9 }}>
+            Documentaire sur la sécurité des travaux en hauteur — Abidjan, 2026
+          </div>
+        </div>
+      </div>
+
+      <div style={{
+        position: 'absolute', top: -20, right: 30,
+        background: '#fff',
+        boxShadow: '0 10px 40px rgba(0,0,0,0.12)',
+        padding: '20px 24px',
+        zIndex: 2,
+        borderTop: `3px solid ${DLM.orange}`,
+      }}>
+        <div style={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 800, fontSize: 32, color: DLM.black, lineHeight: 1 }}>
+          100<span style={{ color: DLM.orange }}>%</span>
+        </div>
+        <div style={{ fontFamily: 'Open Sans, sans-serif', fontSize: 12, color: DLM.gray, marginTop: 6, textTransform: 'uppercase', letterSpacing: '1px' }}>
+          Production locale
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function About() {
+  return (
+    <section id="about" style={{
+      padding: '120px 6%',
+      background: '#fff',
+    }}>
+      <div style={{
+        maxWidth: 1280, margin: '0 auto',
+        display: 'grid',
+        gridTemplateColumns: '1fr 1fr',
+        gap: 80,
+        alignItems: 'center',
+      }} className="dlm-about-grid">
+        <div>
+          <SectionHeader
+            eyebrow="Qui sommes-nous ?"
+            title={<>Une structure ivoirienne au service de la <span style={{ color: DLM.green }}>prévention</span>.</>}
+          />
+          <p style={{
+            fontFamily: 'Open Sans, sans-serif',
+            fontSize: 17, lineHeight: 1.7,
+            color: DLM.black,
+            marginTop: 24,
+          }} className="dlm-reveal">
+            DLM est une structure ivoirienne spécialisée dans la production audiovisuelle et la communication visuelle au service de la prévention des risques professionnels. Nous aidons les entreprises et les institutions à sensibiliser leurs équipes avec des contenus percutants et professionnels.
+          </p>
+
+          <div className="dlm-reveal" style={{
+            marginTop: 36,
+            display: 'grid',
+            gridTemplateColumns: '1fr 1fr',
+            gap: 24,
+          }}>
+            {[
+              { t: 'Approche locale', d: 'Une équipe ivoirienne qui connaît votre terrain.' },
+              { t: 'Contenus percutants', d: 'Des messages qui marquent et qui restent.' },
+              { t: 'Expertise sectorielle', d: 'Industrie, BTP, transport, santé.' },
+              { t: 'De A à Z', d: 'Du conseil au livrable, un seul interlocuteur.' },
+            ].map((f, i) => (
+              <div key={i} style={{
+                paddingLeft: 16,
+                borderLeft: `2px solid ${DLM.orange}`,
+              }}>
+                <div style={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 700, fontSize: 15, marginBottom: 4 }}>{f.t}</div>
+                <div style={{ fontFamily: 'Open Sans, sans-serif', fontSize: 14, color: DLM.gray, lineHeight: 1.5 }}>{f.d}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <AboutVisual />
+      </div>
+    </section>
+  );
+}
+
+function Clients() {
+  const clients = [
+    {
+      title: 'Entreprises',
+      desc: 'Industries, BTP, énergie, agro-alimentaire.',
+      icon: (
+        <svg width="36" height="36" viewBox="0 0 36 36" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+          <rect x="6" y="10" width="11" height="22" />
+          <rect x="17" y="4" width="13" height="28" />
+          <path d="M9 15h2M9 20h2M9 25h2M21 9h2M21 14h2M21 19h2M21 24h2M26 9h2M26 14h2M26 19h2M26 24h2" />
+        </svg>
+      ),
+    },
+    {
+      title: 'Institutions',
+      desc: 'Ministères, agences, collectivités publiques.',
+      icon: (
+        <svg width="36" height="36" viewBox="0 0 36 36" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M3 14L18 5l15 9" />
+          <path d="M6 14v16M30 14v16M3 30h30" />
+          <path d="M11 30V18M18 30V18M25 30V18" />
+        </svg>
+      ),
+    },
+    {
+      title: 'Chaînes de télévision',
+      desc: 'Diffuseurs nationaux et régionaux.',
+      icon: (
+        <svg width="36" height="36" viewBox="0 0 36 36" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+          <rect x="3" y="8" width="30" height="20" rx="2" />
+          <path d="M12 32h12M15 28v4M21 28v4" />
+          <path d="M14 14l8 4-8 4z" fill="currentColor" />
+        </svg>
+      ),
+    },
+    {
+      title: 'Grand public',
+      desc: 'Campagnes de sensibilisation citoyenne.',
+      icon: (
+        <svg width="36" height="36" viewBox="0 0 36 36" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="11" cy="12" r="4" />
+          <circle cx="25" cy="12" r="4" />
+          <circle cx="18" cy="9" r="4" />
+          <path d="M4 28c0-4 3-7 7-7s7 3 7 7M18 28c0-4 3-7 7-7s7 3 7 7" />
+        </svg>
+      ),
+    },
+  ];
+  return (
+    <section style={{
+      padding: '100px 6%',
+      background: '#f4f3ef',
+      borderTop: `1px solid ${DLM.black}08`,
+    }}>
+      <div style={{ maxWidth: 1280, margin: '0 auto' }}>
+        <SectionHeader
+          eyebrow="Nous travaillons avec"
+          title={<>Des partenaires variés, un même objectif&nbsp;: <span style={{ color: DLM.green }}>prévenir</span>.</>}
+          align="center"
+        />
+        <div className="dlm-clients-grid" style={{
+          marginTop: 56,
+          display: 'grid',
+          gridTemplateColumns: 'repeat(4, 1fr)',
+          gap: 20,
+        }}>
+          {clients.map((c, i) => (
+            <div key={i} className="dlm-reveal dlm-client-card" style={{
+              background: '#fff',
+              padding: '36px 28px',
+              textAlign: 'center',
+              position: 'relative',
+              overflow: 'hidden',
+              transition: 'transform 0.3s, box-shadow 0.3s',
+            }}>
+              <div style={{
+                width: 64, height: 64, borderRadius: '50%',
+                background: `${DLM.green}12`,
+                color: DLM.green,
+                display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                marginBottom: 20,
+              }}>
+                {c.icon}
+              </div>
+              <h4 style={{
+                fontFamily: 'Montserrat, sans-serif', fontWeight: 700, fontSize: 17,
+                margin: '0 0 8px', color: DLM.black,
+              }}>{c.title}</h4>
+              <p style={{
+                fontFamily: 'Open Sans, sans-serif', fontSize: 13.5,
+                lineHeight: 1.5, color: DLM.gray, margin: 0,
+              }}>{c.desc}</p>
+              <div style={{
+                position: 'absolute', bottom: 0, left: 0, right: 0, height: 3,
+                background: DLM.orange,
+                transform: 'scaleX(0)', transformOrigin: 'left',
+                transition: 'transform 0.4s',
+              }} className="dlm-client-underline" />
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Contact({ variant }) {
+  const isOrange = variant === 'orange';
+  const bg = isOrange ? DLM.orange : DLM.greenDeep;
+  return (
+    <section id="contact" style={{
+      padding: '120px 6%',
+      background: bg,
+      color: '#fff',
+      position: 'relative',
+      overflow: 'hidden',
+    }}>
+      <svg width="100%" height="100%" viewBox="0 0 1200 600" preserveAspectRatio="xMidYMid slice"
+        style={{ position: 'absolute', inset: 0, opacity: 0.08, pointerEvents: 'none' }}>
+        <defs>
+          <pattern id="ctapattern" x="0" y="0" width="60" height="60" patternUnits="userSpaceOnUse">
+            <circle cx="30" cy="30" r="1.5" fill="#fff" />
+          </pattern>
+        </defs>
+        <rect width="1200" height="600" fill="url(#ctapattern)" />
+        <circle cx="1050" cy="100" r="200" fill="none" stroke="#fff" strokeWidth="1" />
+        <circle cx="1050" cy="100" r="300" fill="none" stroke="#fff" strokeWidth="1" />
+        <circle cx="150" cy="500" r="180" fill="none" stroke="#fff" strokeWidth="1" />
+      </svg>
+
+      <div style={{ maxWidth: 1280, margin: '0 auto', position: 'relative', zIndex: 2 }}>
+        <div className="dlm-contact-grid" style={{
+          display: 'grid',
+          gridTemplateColumns: '1.2fr 1fr',
+          gap: 80,
+          alignItems: 'center',
+        }}>
+          <div>
+            <div className="dlm-reveal" style={{
+              display: 'inline-flex', alignItems: 'center', gap: 12,
+              marginBottom: 20,
+            }}>
+              <span style={{ width: 32, height: 2, background: '#fff' }} />
+              <span style={{
+                fontFamily: 'Montserrat, sans-serif',
+                fontWeight: 700, fontSize: 13,
+                letterSpacing: '3px', textTransform: 'uppercase',
+              }}>Travaillons ensemble</span>
+            </div>
+            <h2 className="dlm-reveal" style={{
+              fontFamily: 'Montserrat, sans-serif', fontWeight: 800,
+              fontSize: 'clamp(38px, 5vw, 64px)',
+              lineHeight: 1, margin: '0 0 24px',
+              letterSpacing: '-1.5px',
+              textWrap: 'balance',
+            }}>
+              Besoin d'un contenu de prévention <em style={{ fontWeight: 800, fontStyle: 'italic' }}>percutant</em>&nbsp;?
+            </h2>
+            <p className="dlm-reveal" style={{
+              fontFamily: 'Open Sans, sans-serif',
+              fontSize: 18, lineHeight: 1.6,
+              opacity: 0.92, margin: '0 0 36px',
+              maxWidth: 540,
+            }}>
+              Parlons de votre projet. Devis sous 48h, un seul interlocuteur, de l'idée au livrable.
+            </p>
+            <div className="dlm-reveal" style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
+              <a href="mailto:eliaskonan2016@gmail.com" style={{
+                background: '#fff',
+                color: isOrange ? DLM.orange : DLM.greenDeep,
+                padding: '18px 32px',
+                fontFamily: 'Montserrat, sans-serif', fontWeight: 700, fontSize: 15,
+                letterSpacing: '0.5px', textTransform: 'uppercase',
+                textDecoration: 'none',
+                display: 'inline-flex', alignItems: 'center', gap: 10,
+                boxShadow: '0 10px 30px rgba(0,0,0,0.15)',
+              }}>
+                Envoyer un message
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <path d="M5 12h14M13 6l6 6-6 6" />
+                </svg>
+              </a>
+              <a href="tel:+2250502088181" style={{
+                color: '#fff',
+                padding: '18px 28px',
+                fontFamily: 'Montserrat, sans-serif', fontWeight: 600, fontSize: 14,
+                letterSpacing: '0.5px', textTransform: 'uppercase',
+                textDecoration: 'none',
+                border: '1.5px solid rgba(255,255,255,0.5)',
+                display: 'inline-flex', alignItems: 'center', gap: 10,
+              }}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.13.96.37 1.9.72 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.91.35 1.85.59 2.81.72A2 2 0 0122 16.92z" />
+                </svg>
+                Appeler
+              </a>
+            </div>
+          </div>
+
+          <div className="dlm-reveal" style={{
+            background: 'rgba(0,0,0,0.18)',
+            backdropFilter: 'blur(8px)',
+            padding: '40px 36px',
+            border: '1px solid rgba(255,255,255,0.15)',
+          }}>
+            <div style={{
+              fontFamily: 'Montserrat, sans-serif', fontWeight: 700, fontSize: 12,
+              letterSpacing: '2px', textTransform: 'uppercase', opacity: 0.7,
+              marginBottom: 28,
+            }}>Coordonnées</div>
+
+            {[
+              {
+                label: 'Téléphone', value: '+225 05 02 08 81 81', href: 'tel:+2250502088181',
+                icon: <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.13.96.37 1.9.72 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.91.35 1.85.59 2.81.72A2 2 0 0122 16.92z" />,
+              },
+              {
+                label: 'Email', value: 'eliaskonan2016@gmail.com', href: 'mailto:eliaskonan2016@gmail.com',
+                icon: <><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" /><polyline points="22,6 12,13 2,6" /></>,
+              },
+              {
+                label: 'Adresse', value: "Abidjan, Côte d'Ivoire", href: null,
+                icon: <><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" /><circle cx="12" cy="10" r="3" /></>,
+              },
+            ].map((c, i) => (
+              <div key={i} style={{
+                display: 'flex', alignItems: 'flex-start', gap: 18,
+                padding: '18px 0',
+                borderBottom: i < 2 ? '1px solid rgba(255,255,255,0.12)' : 'none',
+              }}>
+                <div style={{
+                  width: 40, height: 40, borderRadius: 4,
+                  background: 'rgba(255,255,255,0.15)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  flexShrink: 0,
+                }}>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    {c.icon}
+                  </svg>
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontFamily: 'Open Sans, sans-serif', fontSize: 11, opacity: 0.7, textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: 4 }}>{c.label}</div>
+                  {c.href ? (
+                    <a href={c.href} style={{ color: '#fff', textDecoration: 'none', fontFamily: 'Montserrat, sans-serif', fontWeight: 600, fontSize: 15.5, wordBreak: 'break-word' }}>{c.value}</a>
+                  ) : (
+                    <div style={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 600, fontSize: 15.5 }}>{c.value}</div>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Footer() {
+  return (
+    <footer style={{
+      background: DLM.black,
+      color: '#fff',
+      padding: '64px 6% 32px',
+    }}>
+      <div style={{ maxWidth: 1280, margin: '0 auto' }}>
+        <div className="dlm-footer-grid" style={{
+          display: 'grid',
+          gridTemplateColumns: '2fr 1fr 1fr 1fr',
+          gap: 56,
+          paddingBottom: 48,
+          borderBottom: '1px solid rgba(255,255,255,0.1)',
+        }}>
+          <div>
+            <DLMLogo variant="light" />
+            <p style={{
+              fontFamily: 'Montserrat, sans-serif', fontWeight: 600,
+              fontSize: 18, fontStyle: 'italic',
+              color: DLM.orange,
+              margin: '20px 0 16px',
+              letterSpacing: '-0.3px',
+            }}>« L'œil qui prévient »</p>
+            <p style={{
+              fontFamily: 'Open Sans, sans-serif', fontSize: 14,
+              lineHeight: 1.6, color: 'rgba(255,255,255,0.6)',
+              margin: 0, maxWidth: 360,
+            }}>
+              Production audiovisuelle et communication visuelle au service de la prévention des risques professionnels.
+            </p>
+          </div>
+
+          {[
+            { title: 'Navigation', links: [['Accueil', '#hero'], ['Services', '#services'], ['À propos', '#about'], ['Contact', '#contact']] },
+            { title: 'Services', links: [['Vidéos', '#services'], ['Films docs', '#services'], ['Conseil', '#services'], ['Affiches', '#services']] },
+            { title: 'Contact', links: [['+225 05 02 08 81 81', 'tel:+2250502088181'], ['eliaskonan2016@gmail.com', 'mailto:eliaskonan2016@gmail.com'], ["Abidjan, CI", null]] },
+          ].map((col, i) => (
+            <div key={i}>
+              <div style={{
+                fontFamily: 'Montserrat, sans-serif', fontWeight: 700,
+                fontSize: 13, letterSpacing: '2px', textTransform: 'uppercase',
+                color: '#fff', marginBottom: 20,
+              }}>{col.title}</div>
+              <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 12 }}>
+                {col.links.map(([label, href], j) => (
+                  <li key={j}>
+                    {href ? (
+                      <a href={href} style={{
+                        color: 'rgba(255,255,255,0.65)', textDecoration: 'none',
+                        fontFamily: 'Open Sans, sans-serif', fontSize: 14,
+                        transition: 'color 0.2s',
+                      }} className="dlm-footer-link">{label}</a>
+                    ) : (
+                      <span style={{ color: 'rgba(255,255,255,0.65)', fontFamily: 'Open Sans, sans-serif', fontSize: 14 }}>{label}</span>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+
+        <div style={{
+          paddingTop: 28,
+          display: 'flex', justifyContent: 'space-between',
+          alignItems: 'center', flexWrap: 'wrap', gap: 20,
+        }}>
+          <div style={{
+            fontFamily: 'Open Sans, sans-serif', fontSize: 13,
+            color: 'rgba(255,255,255,0.5)',
+          }}>
+            © 2026 Découvre Le Monde. Tous droits réservés.
+          </div>
+          <div style={{ display: 'flex', gap: 12 }}>
+            {[
+              { label: 'Facebook', href: 'https://facebook.com/EliasKonan', icon: <path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z" /> },
+              { label: 'LinkedIn', href: 'https://linkedin.com/in/konan-elias-kouadio', icon: <><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-4 0v7h-4v-7a6 6 0 016-6z" /><rect x="2" y="9" width="4" height="12" /><circle cx="4" cy="4" r="2" /></> },
+              { label: 'TikTok', href: 'https://tiktok.com/@EliasKonan', icon: <path d="M9 12a4 4 0 104 4V4a5 5 0 005 5" /> },
+            ].map((s, i) => (
+              <a key={i} href={s.href} target="_blank" rel="noopener noreferrer" aria-label={s.label} style={{
+                width: 38, height: 38,
+                border: '1px solid rgba(255,255,255,0.2)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                color: 'rgba(255,255,255,0.7)',
+                transition: 'all 0.2s',
+                textDecoration: 'none',
+              }} className="dlm-social">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  {s.icon}
+                </svg>
+              </a>
+            ))}
+          </div>
+        </div>
+      </div>
+    </footer>
+  );
+}
+
+Object.assign(window, {
+  DLM, DLMLogo, Header, Hero, Services, About, Clients, Contact, Footer,
+});
+</script>
+
+<!-- ============================================================ -->
+<!-- APP                                                           -->
+<!-- ============================================================ -->
+<script type="text/babel">
+const TWEAK_DEFAULTS = {
+  "heroBackdrop": "globe",
+  "ctaVariant": "orange"
+};
+
+function App() {
+  const [scrolled, setScrolled] = React.useState(false);
+  const [tweaks, setTweak] = useTweaks(TWEAK_DEFAULTS);
+
+  React.useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 60);
+    window.addEventListener('scroll', onScroll);
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  React.useEffect(() => {
+    const els = document.querySelectorAll('.dlm-reveal');
+    els.forEach((el) => {
+      const r = el.getBoundingClientRect();
+      if (r.top < window.innerHeight * 0.95) el.classList.add('is-visible');
+    });
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((e) => {
+        if (e.isIntersecting) {
+          e.target.classList.add('is-visible');
+          observer.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -60px 0px' });
+    els.forEach((el) => observer.observe(el));
+    const fallback = setTimeout(() => {
+      document.querySelectorAll('.dlm-reveal').forEach((el) => el.classList.add('is-visible'));
+    }, 600);
+    return () => { observer.disconnect(); clearTimeout(fallback); };
+  }, [tweaks.heroBackdrop, tweaks.ctaVariant]);
+
+  return (
+    <>
+      <Header scrolled={scrolled} />
+      <Hero bgVariant={tweaks.heroBackdrop} />
+      <Services />
+      <About />
+      <Clients />
+      <Contact variant={tweaks.ctaVariant} />
+      <Footer />
+
+      <TweaksPanel title="Tweaks">
+        <TweakSection label="Hero — motif de fond">
+          <TweakRadio
+            label="Style visuel"
+            value={tweaks.heroBackdrop}
+            onChange={(v) => setTweak('heroBackdrop', v)}
+            options={[
+              { value: 'radar', label: 'Radar' },
+              { value: 'globe', label: 'Globe' },
+              { value: 'grid', label: 'Grille' },
+            ]}
+          />
+        </TweakSection>
+        <TweakSection label="Section CTA finale">
+          <TweakRadio
+            label="Couleur de fond"
+            value={tweaks.ctaVariant}
+            onChange={(v) => setTweak('ctaVariant', v)}
+            options={[
+              { value: 'orange', label: 'Orange' },
+              { value: 'green', label: 'Vert profond' },
+            ]}
+          />
+        </TweakSection>
+      </TweaksPanel>
+    </>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+
+<style id="__om-edit-overrides"></style>
+</body>
+</html>
