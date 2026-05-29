@@ -1,6 +1,15 @@
 {
   "videos": [
     {
+      "source_file": "Risques-electriques.youtube",
+      "title": "Risques electriques",
+      "desc": "Vidéo de sensibilisation DLM.",
+      "duration": "",
+      "type": "youtube",
+      "url": "https://youtu.be/ZyEwd7rUehU",
+      "added": "2026-05-29"
+    },
+    {
       "source_file": "Video-Presentation-DLM-YouTube.mp4",
       "title": "Présentation DLM",
       "desc": "Découvre Le Monde · Production audiovisuelle au service de la prévention",
