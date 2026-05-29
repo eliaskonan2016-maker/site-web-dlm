@@ -1,6 +1,15 @@
 {
   "videos": [
     {
+      "source_file": "Sensibilisation-DLM.youtube",
+      "title": "Sensibilisation DLM",
+      "desc": "Vidéo de sensibilisation DLM.",
+      "duration": "",
+      "type": "youtube",
+      "url": "https://youtu.be/X8wNBFWdaSw",
+      "added": "2026-05-29"
+    },
+    {
       "source_file": "Risques-electriques.youtube",
       "title": "Risques electriques",
       "desc": "Vidéo de sensibilisation DLM.",
