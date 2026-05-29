@@ -1,0 +1,11 @@
+{
+  "videos": [
+    {
+      "title": "Présentation DLM",
+      "desc": "Découvre Le Monde · Production audiovisuelle au service de la prévention",
+      "duration": "43 secondes",
+      "file": "./videos/Video-Presentation-DLM-YouTube.mp4",
+      "added": "2026-05-29"
+    }
+  ]
+}

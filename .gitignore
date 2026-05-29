@@ -1,0 +1,4 @@
+.DS_Store
+*.DS_Store
+# Vidéos lourdes (> 100 Mo) non supportées par GitHub
+videos/Risques\ électriques.mov

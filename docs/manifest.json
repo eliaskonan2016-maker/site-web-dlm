@@ -1,0 +1,13 @@
+{
+  "documents": [
+    {
+      "category": "Prévention",
+      "title": "Risques Chimiques — Travailleurs indépendants",
+      "desc": "Affiche de sensibilisation aux règles essentielles de protection contre les risques chimiques : port des EPI, lecture des FDS, ventilation et stockage des produits.",
+      "type": "PDF",
+      "size": "4.0 Mo",
+      "file": "./docs/Affiche-Risques-Chimiques-DLM.pdf",
+      "added": "2026-05-29"
+    }
+  ]
+}
