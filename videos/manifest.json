@@ -1,6 +1,15 @@
 {
   "videos": [
     {
+      "source_file": "Relation-humaine.youtube",
+      "title": "Relation humaine",
+      "desc": "Vidéo de sensibilisation DLM.",
+      "duration": "",
+      "type": "youtube",
+      "url": "https://youtu.be/hVwkk71wNuIE",
+      "added": "2026-05-29"
+    },
+    {
       "source_file": "Sensibilisation-DLM.youtube",
       "title": "Histoire de la prévention",
       "desc": "Vidéo de sensibilisation sur l'histoire de la prévention des risques professionnels.",
