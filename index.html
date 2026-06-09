@@ -138,6 +138,16 @@
 <body>
 <div id="root"></div>
 
+<!-- Formulaire statique pour détection par Netlify (ne pas supprimer) -->
+<form name="devis" netlify netlify-honeypot="bot-field" hidden>
+  <input name="nom" />
+  <input name="entreprise" />
+  <input name="telephone" />
+  <input name="email" />
+  <input name="service" />
+  <textarea name="message"></textarea>
+</form>
+
 <!-- ============================================================ -->
 <!-- TWEAKS PANEL                                                  -->
 <!-- ============================================================ -->
@@ -453,7 +463,7 @@ function DLMLogo({ variant = 'light', size = 1 }) {
   );
 }
 
-function Header({ scrolled }) {
+function Header({ scrolled, onDevisOpen }) {
   const [open, setOpen] = React.useState(false);
   const links = [
     { label: 'Accueil', href: '#hero' },
@@ -487,7 +497,7 @@ function Header({ scrolled }) {
             padding: '6px 0',
           }} className="dlm-nav-link">{l.label}</a>
         ))}
-        <a href="#contact" style={{
+        <button onClick={onDevisOpen} style={{
           background: DLM.orange,
           color: '#fff',
           padding: '11px 22px',
@@ -495,11 +505,12 @@ function Header({ scrolled }) {
           fontFamily: 'Montserrat, sans-serif',
           fontWeight: 700,
           fontSize: 14,
-          textDecoration: 'none',
+          border: 'none',
+          cursor: 'pointer',
           letterSpacing: '0.5px',
           boxShadow: '0 4px 14px rgba(246,127,0,0.35)',
           transition: 'transform 0.2s, box-shadow 0.2s',
-        }} className="dlm-cta-mini">Demander un devis</a>
+        }} className="dlm-cta-mini">Demander un devis</button>
       </nav>
       <button className="dlm-burger" onClick={() => setOpen(!open)} style={{
         background: 'transparent', border: 'none', color: '#fff',
@@ -627,7 +638,7 @@ function HeroBackdrop({ variant }) {
   );
 }
 
-function Hero({ bgVariant }) {
+function Hero({ bgVariant, onDevisOpen }) {
   return (
     <section id="hero" style={{
       position: 'relative',
@@ -675,7 +686,7 @@ function Hero({ bgVariant }) {
           Production audiovisuelle et communication visuelle au service de la prévention des risques professionnels.
         </p>
         <div className="dlm-reveal" style={{ display: 'flex', gap: 16, flexWrap: 'wrap', alignItems: 'center' }}>
-          <a href="#contact" className="dlm-btn-primary" style={{
+          <button onClick={onDevisOpen} className="dlm-btn-primary" style={{
             background: DLM.orange,
             color: '#fff',
             padding: '18px 32px',
@@ -685,7 +696,8 @@ function Hero({ bgVariant }) {
             fontSize: 15,
             letterSpacing: '0.5px',
             textTransform: 'uppercase',
-            textDecoration: 'none',
+            border: 'none',
+            cursor: 'pointer',
             display: 'inline-flex', alignItems: 'center', gap: 10,
             boxShadow: '0 10px 30px rgba(246,127,0,0.4)',
           }}>
@@ -693,7 +705,7 @@ function Hero({ bgVariant }) {
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
               <path d="M5 12h14M13 6l6 6-6 6" />
             </svg>
-          </a>
+          </button>
           <a href="#services" style={{
             color: '#fff',
             padding: '18px 24px',
@@ -908,147 +920,34 @@ function ServiceCard({ icon, title, desc, n, index }) {
   );
 }
 
-function getYouTubeId(url) {
-  const m = (url || '').match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
-  return m ? m[1] : null;
-}
-
-function VideoInfoBar({ video }) {
-  return (
-    <div style={{
-      background: 'rgba(0,0,0,0.32)', backdropFilter: 'blur(12px)',
-      border: '1px solid rgba(255,255,255,0.10)',
-      padding: '20px 28px', display: 'flex', justifyContent: 'space-between',
-      alignItems: 'center', flexWrap: 'wrap', gap: 16, marginTop: 12,
-    }}>
-      <div>
-        <div style={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 700, fontSize: 16, color: '#fff' }}>
-          {video.title}{video.duration ? ` · ${video.duration}` : ''}
-        </div>
-        <div style={{ fontFamily: 'Open Sans, sans-serif', fontSize: 13, color: 'rgba(255,255,255,0.6)', marginTop: 4 }}>
-          {video.desc}
-        </div>
-      </div>
-      <a href="#contact" style={{
-        background: DLM.orange, color: '#fff', padding: '12px 22px',
-        fontFamily: 'Montserrat, sans-serif', fontWeight: 700, fontSize: 13,
-        letterSpacing: '0.5px', textTransform: 'uppercase', textDecoration: 'none',
-        display: 'inline-flex', alignItems: 'center', gap: 8,
-        boxShadow: '0 6px 20px rgba(246,127,0,0.35)', flexShrink: 0,
-      }}>
-        Travailler avec nous
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-          <path d="M5 12h14M13 6l6 6-6 6" />
-        </svg>
-      </a>
-    </div>
-  );
-}
-
-function VideoPlayer({ video }) {
+function VideoSection() {
   const [playing, setPlaying] = React.useState(false);
   const videoRef = React.useRef(null);
-
-  React.useEffect(() => {
-    const v = videoRef.current;
-    if (!v) return;
-    setPlaying(false);
-    v.load();
-    const onEnd = () => setPlaying(false);
-    v.addEventListener('ended', onEnd);
-    return () => v.removeEventListener('ended', onEnd);
-  }, [video.file]);
 
   const toggle = () => {
     const v = videoRef.current;
     if (!v) return;
-    v.paused ? (v.play(), setPlaying(true)) : (v.pause(), setPlaying(false));
+    if (v.paused) { v.play(); setPlaying(true); }
+    else          { v.pause(); setPlaying(false); }
   };
 
-  // ── YouTube ──
-  if (video.type === 'youtube') {
-    const ytId = getYouTubeId(video.url);
-    if (!ytId) return null;
-    return (
-      <div>
-        <div style={{
-          position: 'relative', paddingBottom: '56.25%', background: '#000',
-          borderRadius: 4, overflow: 'hidden',
-          boxShadow: '0 30px 80px rgba(0,0,0,0.55)',
-          border: '1px solid rgba(255,255,255,0.08)',
-        }}>
-          <iframe
-            src={`https://www.youtube.com/embed/${ytId}?rel=0`}
-            style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', border: 'none' }}
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowFullScreen
-          />
-        </div>
-        <VideoInfoBar video={video} />
-      </div>
-    );
-  }
-
-  // ── Vidéo locale ──
-  return (
-    <div>
-      <div style={{
-        position: 'relative', paddingBottom: '56.25%', background: '#000',
-        borderRadius: 4, overflow: 'hidden',
-        boxShadow: '0 30px 80px rgba(0,0,0,0.55)',
-        border: '1px solid rgba(255,255,255,0.08)',
-      }}>
-        <video ref={videoRef} src={video.file} onClick={toggle} style={{
-          position: 'absolute', top: 0, left: 0,
-          width: '100%', height: '100%', objectFit: 'cover', cursor: 'pointer',
-        }} />
-        {!playing && (
-          <div onClick={toggle} style={{
-            position: 'absolute', inset: 0, background: 'rgba(0,18,12,0.48)',
-            display: 'flex', flexDirection: 'column',
-            alignItems: 'center', justifyContent: 'center', cursor: 'pointer', gap: 20,
-          }}>
-            <div style={{
-              width: 88, height: 88, borderRadius: '50%', background: DLM.orange,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              boxShadow: '0 0 0 16px rgba(246,127,0,0.20), 0 0 0 32px rgba(246,127,0,0.08), 0 24px 60px rgba(0,0,0,0.5)',
-            }}>
-              <svg width="30" height="30" viewBox="0 0 24 24" fill="white" style={{ marginLeft: 5 }}>
-                <path d="M5 3l14 9-14 9z" />
-              </svg>
-            </div>
-            <div style={{
-              fontFamily: 'Montserrat, sans-serif', fontWeight: 600, fontSize: 13,
-              letterSpacing: '2px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.75)',
-            }}>Lancer la vidéo</div>
-          </div>
-        )}
-        {playing && <div onClick={toggle} style={{ position: 'absolute', inset: 0, cursor: 'pointer' }} />}
-      </div>
-      <VideoInfoBar video={video} />
-    </div>
-  );
-}
-
-function VideoSection() {
-  const [videos, setVideos] = React.useState([]);
-  const [active, setActive] = React.useState(0);
-
   React.useEffect(() => {
-    fetch('./videos/manifest.json?t=' + Date.now())
-      .then(r => r.json())
-      .then(data => setVideos(data.videos || []))
-      .catch(() => {});
+    const v = videoRef.current;
+    if (!v) return;
+    const onEnd = () => setPlaying(false);
+    v.addEventListener('ended', onEnd);
+    return () => v.removeEventListener('ended', onEnd);
   }, []);
-
-  if (!videos.length) return null;
 
   return (
     <section id="video" style={{
       padding: '120px 6%',
       background: `linear-gradient(135deg, ${DLM.greenDeeper} 0%, ${DLM.greenDeep} 100%)`,
-      color: '#fff', position: 'relative', overflow: 'hidden',
+      color: '#fff',
+      position: 'relative',
+      overflow: 'hidden',
     }}>
+      {/* Fond décoratif */}
       <svg width="100%" height="100%" viewBox="0 0 1200 700" preserveAspectRatio="xMidYMid slice"
         style={{ position: 'absolute', inset: 0, opacity: 0.07, pointerEvents: 'none' }}>
         <defs>
@@ -1063,36 +962,111 @@ function VideoSection() {
 
       <div style={{ maxWidth: 1280, margin: '0 auto', position: 'relative', zIndex: 2 }}>
         <SectionHeader
-          eyebrow="Nos vidéos"
+          eyebrow="Notre structure en vidéo"
           title={<>Découvrez DLM <span style={{ color: DLM.orange }}>en images</span>.</>}
-          desc="Vidéos de sensibilisation, présentations et documentaires produits par DLM."
+          desc="Présentation de notre structure, nos services et notre vision de la prévention des risques professionnels."
           invert={true}
         />
 
-        <div className="dlm-reveal" style={{ marginTop: 56, maxWidth: 1100, margin: '56px auto 0' }}>
-          <VideoPlayer video={videos[active]} />
-        </div>
+        {/* Lecteur vidéo */}
+        <div className="dlm-reveal" style={{ marginTop: 56, maxWidth: 1100, marginLeft: 'auto', marginRight: 'auto' }}>
 
-        {videos.length > 1 && (
-          <div className="dlm-reveal" style={{
-            marginTop: 32, maxWidth: 1100, margin: '24px auto 0',
-            display: 'flex', gap: 12, overflowX: 'auto', paddingBottom: 8,
+          {/* Conteneur 16:9 */}
+          <div style={{
+            position: 'relative',
+            paddingBottom: '56.25%',
+            background: '#000',
+            borderRadius: 4,
+            overflow: 'hidden',
+            boxShadow: '0 30px 80px rgba(0,0,0,0.55)',
+            border: `1px solid rgba(255,255,255,0.08)`,
           }}>
-            {videos.map((v, i) => (
-              <button key={i} onClick={() => setActive(i)} style={{
-                flexShrink: 0, padding: '12px 20px', cursor: 'pointer',
-                background: i === active ? DLM.orange : 'rgba(255,255,255,0.1)',
-                border: `1px solid ${i === active ? DLM.orange : 'rgba(255,255,255,0.2)'}`,
-                color: '#fff',
-                fontFamily: 'Montserrat, sans-serif', fontWeight: 600, fontSize: 13,
-                transition: 'all 0.2s', textAlign: 'left', maxWidth: 220,
+            <video
+              ref={videoRef}
+              src="./videos/Video-Presentation-DLM-YouTube.mp4"
+              onClick={toggle}
+              style={{
+                position: 'absolute', top: 0, left: 0,
+                width: '100%', height: '100%',
+                objectFit: 'cover',
+                cursor: 'pointer',
+              }}
+            />
+
+            {/* Overlay play/pause */}
+            {!playing && (
+              <div onClick={toggle} style={{
+                position: 'absolute', inset: 0,
+                background: 'rgba(0,18,12,0.48)',
+                display: 'flex', flexDirection: 'column',
+                alignItems: 'center', justifyContent: 'center',
+                cursor: 'pointer',
+                gap: 20,
               }}>
-                <div style={{ fontSize: 11, opacity: 0.7, marginBottom: 4 }}>{i + 1 < 10 ? `0${i+1}` : i+1}</div>
-                <div style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{v.title}</div>
-              </button>
-            ))}
+                {/* Bouton play */}
+                <div style={{
+                  width: 88, height: 88, borderRadius: '50%',
+                  background: DLM.orange,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  boxShadow: `0 0 0 16px rgba(246,127,0,0.20), 0 0 0 32px rgba(246,127,0,0.08), 0 24px 60px rgba(0,0,0,0.5)`,
+                  transition: 'transform 0.2s',
+                }}>
+                  <svg width="30" height="30" viewBox="0 0 24 24" fill="white" style={{ marginLeft: 5 }}>
+                    <path d="M5 3l14 9-14 9z" />
+                  </svg>
+                </div>
+                <div style={{
+                  fontFamily: 'Montserrat, sans-serif', fontWeight: 600, fontSize: 13,
+                  letterSpacing: '2px', textTransform: 'uppercase',
+                  color: 'rgba(255,255,255,0.75)',
+                }}>Lancer la vidéo</div>
+              </div>
+            )}
+
+            {/* Bouton pause au clic si en lecture */}
+            {playing && (
+              <div onClick={toggle} style={{
+                position: 'absolute', inset: 0, cursor: 'pointer',
+              }} />
+            )}
           </div>
-        )}
+
+          {/* Bande info sous la vidéo */}
+          <div style={{
+            background: 'rgba(0,0,0,0.32)',
+            backdropFilter: 'blur(12px)',
+            border: '1px solid rgba(255,255,255,0.10)',
+            padding: '20px 28px',
+            display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+            flexWrap: 'wrap', gap: 16,
+            marginTop: 12,
+          }}>
+            <div>
+              <div style={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 700, fontSize: 16, color: '#fff' }}>
+                Présentation DLM · 43 secondes
+              </div>
+              <div style={{ fontFamily: 'Open Sans, sans-serif', fontSize: 13, color: 'rgba(255,255,255,0.6)', marginTop: 4 }}>
+                Découvre Le Monde · Production audiovisuelle au service de la prévention
+              </div>
+            </div>
+            <a href="#contact" style={{
+              background: DLM.orange,
+              color: '#fff',
+              padding: '12px 22px',
+              fontFamily: 'Montserrat, sans-serif', fontWeight: 700, fontSize: 13,
+              letterSpacing: '0.5px', textTransform: 'uppercase',
+              textDecoration: 'none',
+              display: 'inline-flex', alignItems: 'center', gap: 8,
+              boxShadow: '0 6px 20px rgba(246,127,0,0.35)',
+              flexShrink: 0,
+            }}>
+              Travailler avec nous
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <path d="M5 12h14M13 6l6 6-6 6" />
+              </svg>
+            </a>
+          </div>
+        </div>
       </div>
     </section>
   );
@@ -1794,8 +1768,244 @@ function Resources() {
   );
 }
 
+function DevisModal({ open, onClose }) {
+  const [form, setForm] = React.useState({
+    nom: '', entreprise: '', telephone: '', email: '', service: '', message: '',
+  });
+  const [submitted, setSubmitted] = React.useState(false);
+  const [loading, setLoading] = React.useState(false);
+  const [hasError, setHasError] = React.useState(false);
+
+  React.useEffect(() => {
+    if (!open) return;
+    const onKey = (e) => { if (e.key === 'Escape') handleClose(); };
+    window.addEventListener('keydown', onKey);
+    document.body.style.overflow = 'hidden';
+    return () => {
+      window.removeEventListener('keydown', onKey);
+      document.body.style.overflow = '';
+    };
+  }, [open]);
+
+  const handleClose = () => {
+    setForm({ nom: '', entreprise: '', telephone: '', email: '', service: '', message: '' });
+    setSubmitted(false);
+    setHasError(false);
+    onClose();
+  };
+
+  const handleChange = (e) => setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
+
+  const encode = (data) =>
+    Object.keys(data).map(k => encodeURIComponent(k) + '=' + encodeURIComponent(data[k])).join('&');
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setHasError(false);
+    fetch('/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: encode({ 'form-name': 'devis', ...form }),
+    })
+    .then(() => { setSubmitted(true); setLoading(false); })
+    .catch(() => { setHasError(true); setLoading(false); });
+  };
+
+  if (!open) return null;
+
+  const labelStyle = {
+    fontFamily: 'Montserrat, sans-serif',
+    fontWeight: 600, fontSize: 11,
+    letterSpacing: '1.2px', textTransform: 'uppercase',
+    color: DLM.black,
+  };
+  const inputStyle = {
+    fontFamily: 'Open Sans, sans-serif',
+    fontSize: 14, color: DLM.black,
+    padding: '11px 14px',
+    border: `1.5px solid ${DLM.black}20`,
+    outline: 'none',
+    background: '#fafaf8',
+    width: '100%', boxSizing: 'border-box',
+  };
+
+  return (
+    <div
+      onClick={(e) => { if (e.target === e.currentTarget) handleClose(); }}
+      style={{
+        position: 'fixed', inset: 0, zIndex: 9000,
+        background: 'rgba(0,18,12,0.75)',
+        backdropFilter: 'blur(6px)',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        padding: '20px',
+        overflowY: 'auto',
+      }}
+    >
+      <div style={{
+        background: '#fff',
+        width: '100%', maxWidth: 580,
+        position: 'relative',
+        boxShadow: '0 30px 80px rgba(0,0,0,0.5)',
+      }}>
+        {/* En-tête orange */}
+        <div style={{
+          background: DLM.orange,
+          padding: '24px 32px',
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        }}>
+          <div>
+            <div style={{
+              fontFamily: 'Montserrat, sans-serif', fontWeight: 800,
+              fontSize: 20, color: '#fff', letterSpacing: '-0.3px',
+            }}>Demander un devis</div>
+            <div style={{
+              fontFamily: 'Open Sans, sans-serif', fontSize: 13,
+              color: 'rgba(255,255,255,0.85)', marginTop: 4,
+            }}>Réponse sous 48h · Un seul interlocuteur</div>
+          </div>
+          <button
+            onClick={handleClose}
+            style={{
+              background: 'rgba(255,255,255,0.2)', border: 'none',
+              cursor: 'pointer', width: 36, height: 36, borderRadius: '50%',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              color: '#fff', fontSize: 16, lineHeight: 1,
+            }}
+          >✕</button>
+        </div>
+
+        {/* Corps */}
+        <div style={{ padding: '32px', maxHeight: 'calc(90vh - 100px)', overflowY: 'auto' }}>
+          {submitted ? (
+            <div style={{ textAlign: 'center', padding: '24px 0 8px' }}>
+              <div style={{
+                width: 64, height: 64, borderRadius: '50%',
+                background: `${DLM.green}18`,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                margin: '0 auto 20px',
+              }}>
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none"
+                  stroke={DLM.green} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M20 6L9 17l-5-5" />
+                </svg>
+              </div>
+              <h3 style={{
+                fontFamily: 'Montserrat, sans-serif', fontWeight: 700,
+                fontSize: 22, color: DLM.black, margin: '0 0 12px',
+              }}>Demande bien reçue !</h3>
+              <p style={{
+                fontFamily: 'Open Sans, sans-serif', fontSize: 15,
+                color: DLM.gray, lineHeight: 1.6, margin: '0 auto 28px',
+                maxWidth: 380,
+              }}>
+                Nous avons bien reçu votre demande de devis et vous recontacterons sous 48h.
+              </p>
+              <button onClick={handleClose} style={{
+                background: DLM.orange, color: '#fff',
+                border: 'none', cursor: 'pointer',
+                padding: '14px 36px',
+                fontFamily: 'Montserrat, sans-serif', fontWeight: 700,
+                fontSize: 14, letterSpacing: '0.5px', textTransform: 'uppercase',
+              }}>Fermer</button>
+            </div>
+          ) : (
+            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  <label style={labelStyle}>Nom complet *</label>
+                  <input name="nom" value={form.nom} onChange={handleChange} required
+                    placeholder="KOUADIO Jean" style={inputStyle} />
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  <label style={labelStyle}>Entreprise</label>
+                  <input name="entreprise" value={form.entreprise} onChange={handleChange}
+                    placeholder="Société XYZ" style={inputStyle} />
+                </div>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  <label style={labelStyle}>Téléphone *</label>
+                  <input name="telephone" value={form.telephone} onChange={handleChange} required
+                    placeholder="+225 XX XX XX XX XX" style={inputStyle} />
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  <label style={labelStyle}>Email *</label>
+                  <input type="email" name="email" value={form.email} onChange={handleChange} required
+                    placeholder="votre@email.com" style={inputStyle} />
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                <label style={labelStyle}>Type de prestation *</label>
+                <select name="service" value={form.service} onChange={handleChange} required style={inputStyle}>
+                  <option value="">Choisir une prestation...</option>
+                  <option value="Vidéo de sensibilisation">Vidéo de sensibilisation</option>
+                  <option value="Film documentaire">Film documentaire</option>
+                  <option value="Conseil prévention & sécurité">Conseil prévention &amp; sécurité</option>
+                  <option value="Affiche de sensibilisation">Affiche de sensibilisation</option>
+                  <option value="Pictogrammes de sécurité">Pictogrammes de sécurité</option>
+                  <option value="Affiche publicitaire">Affiche publicitaire</option>
+                  <option value="Autre">Autre</option>
+                </select>
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                <label style={labelStyle}>Description du projet</label>
+                <textarea name="message" value={form.message} onChange={handleChange}
+                  placeholder="Décrivez votre projet, vos objectifs, votre budget estimé..."
+                  rows={4} style={{ ...inputStyle, resize: 'vertical', minHeight: 96 }} />
+              </div>
+
+              {hasError && (
+                <div style={{
+                  padding: '12px 16px',
+                  background: '#fff5f5', borderLeft: '3px solid #e53e3e',
+                  fontFamily: 'Open Sans, sans-serif', fontSize: 13, color: '#c53030',
+                }}>
+                  Erreur lors de l'envoi. Contactez-nous directement : contact@decouvrelemonde.com
+                </div>
+              )}
+
+              <button type="submit" disabled={loading} style={{
+                background: loading ? DLM.gray : DLM.orange,
+                color: '#fff', border: 'none',
+                cursor: loading ? 'default' : 'pointer',
+                padding: '16px 32px',
+                fontFamily: 'Montserrat, sans-serif', fontWeight: 700,
+                fontSize: 14, letterSpacing: '0.5px', textTransform: 'uppercase',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
+                transition: 'background 0.2s',
+                width: '100%',
+              }}>
+                {loading ? 'Envoi en cours…' : (
+                  <React.Fragment>
+                    Envoyer ma demande
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none"
+                      stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M5 12h14M13 6l6 6-6 6" />
+                    </svg>
+                  </React.Fragment>
+                )}
+              </button>
+
+              <p style={{
+                fontFamily: 'Open Sans, sans-serif', fontSize: 12,
+                color: DLM.gray, textAlign: 'center', margin: '-8px 0 0',
+              }}>
+                Vos coordonnées sont utilisées uniquement pour traiter votre demande.
+              </p>
+            </form>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 Object.assign(window, {
-  DLM, DLMLogo, Header, Hero, VideoSection, Services, About, Clients, Contact, Footer, DocumentCard, Resources,
+  DLM, DLMLogo, Header, Hero, VideoSection, Services, About, Clients, Contact, Footer, DocumentCard, Resources, DevisModal,
 });
 </script>
 
@@ -1811,6 +2021,7 @@ const TWEAK_DEFAULTS = {
 function App() {
   const [scrolled, setScrolled] = React.useState(false);
   const [tweaks, setTweak] = useTweaks(TWEAK_DEFAULTS);
+  const [devisOpen, setDevisOpen] = React.useState(false);
 
   React.useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 60);
@@ -1841,8 +2052,9 @@ function App() {
 
   return (
     <>
-      <Header scrolled={scrolled} />
-      <Hero bgVariant={tweaks.heroBackdrop} />
+      <DevisModal open={devisOpen} onClose={() => setDevisOpen(false)} />
+      <Header scrolled={scrolled} onDevisOpen={() => setDevisOpen(true)} />
+      <Hero bgVariant={tweaks.heroBackdrop} onDevisOpen={() => setDevisOpen(true)} />
       <VideoSection />
       <Services />
       <About />
