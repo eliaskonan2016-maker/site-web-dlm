@@ -2,12 +2,13 @@
   "documents": [
     {
       "source_file": "Affiche-Risques-Chimiques-DLM.pdf",
-      "category": "Ressource",
-      "title": "Affiche Risques Chimiques DLM",
-      "desc": "Document disponible en consultation et téléchargement libres.",
+      "category": "Affiche",
+      "title": "Affiche Risques Chimiques",
+      "desc": "Affiche de sensibilisation aux risques liés aux produits chimiques en entreprise. Prête à imprimer et à afficher.",
       "type": "PDF",
       "size": "4.0 Mo",
       "file": "./docs/Affiche-Risques-Chimiques-DLM.pdf",
+      "price": 5000,
       "added": "2026-05-29"
     }
   ]
