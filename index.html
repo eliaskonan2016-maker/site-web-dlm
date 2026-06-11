@@ -169,16 +169,6 @@
 <body>
 <div id="root"></div>
 
-<!-- Formulaire statique pour détection par Netlify (ne pas supprimer) -->
-<form name="devis" data-netlify="true" netlify-honeypot="bot-field" style="display:none">
-  <input name="bot-field" />
-  <input name="nom" />
-  <input name="entreprise" />
-  <input name="telephone" />
-  <input name="email" />
-  <input name="service" />
-  <textarea name="message"></textarea>
-</form>
 
 <!-- ============================================================ -->
 <!-- TWEAKS PANEL                                                  -->
@@ -1854,10 +1844,10 @@ function DevisModal({ open, onClose }) {
     e.preventDefault();
     setLoading(true);
     setHasError(false);
-    fetch('/', {
+    fetch('https://formspree.io/f/maqzdlrl', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: encode({ 'form-name': 'devis', ...form }),
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(form),
     })
     .then(res => {
       if (res.ok) { setSubmitted(true); } else { setHasError(true); }
