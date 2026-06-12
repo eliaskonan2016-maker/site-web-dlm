@@ -155,6 +155,7 @@
     .dlm-clients-grid { grid-template-columns: repeat(2, 1fr) !important; }
     .dlm-contact-grid { grid-template-columns: 1fr !important; gap: 48px !important; }
     .dlm-footer-grid { grid-template-columns: 1fr 1fr !important; gap: 40px !important; }
+    :root { --hero-img-display: none; }
   }
   @media (max-width: 560px) {
     .dlm-clients-grid { grid-template-columns: 1fr !important; }
@@ -672,7 +673,27 @@ function Hero({ bgVariant, onDevisOpen }) {
       padding: '120px 6% 80px',
     }}>
       <HeroBackdrop variant={bgVariant} />
-      <div style={{ position: 'relative', zIndex: 2, maxWidth: 760 }}>
+
+      {/* Illustration travailleur — fond droit, desktop uniquement */}
+      <img
+        src="travailleur-hero.png"
+        alt=""
+        aria-hidden="true"
+        style={{
+          position: 'absolute',
+          right: '-20px',
+          bottom: 0,
+          height: '88%',
+          width: 'auto',
+          opacity: 0.22,
+          mixBlendMode: 'luminosity',
+          zIndex: 1,
+          pointerEvents: 'none',
+          display: 'var(--hero-img-display, block)',
+        }}
+      />
+
+      <div style={{ position: 'relative', zIndex: 2, maxWidth: 640 }}>
         <div className="dlm-reveal" style={{
           display: 'inline-flex', alignItems: 'center', gap: 10,
           padding: '8px 16px',
@@ -683,7 +704,7 @@ function Hero({ bgVariant, onDevisOpen }) {
         }}>
           <span style={{ width: 8, height: 8, borderRadius: '50%', background: DLM.orange, boxShadow: `0 0 10px ${DLM.orange}` }} />
           <span style={{ fontFamily: 'Open Sans, sans-serif', fontSize: 13, fontWeight: 600, letterSpacing: '1.5px', textTransform: 'uppercase' }}>
-            Abidjan · Côte d'Ivoire
+            Spécialiste SST · Abidjan, Côte d'Ivoire
           </span>
         </div>
         <h1 className="dlm-reveal" style={{
@@ -699,16 +720,16 @@ function Hero({ bgVariant, onDevisOpen }) {
         </h1>
         <p className="dlm-reveal" style={{
           fontFamily: 'Open Sans, sans-serif',
-          fontSize: 'clamp(17px, 1.4vw, 21px)',
-          lineHeight: 1.55,
-          maxWidth: 560,
+          fontSize: 'clamp(17px, 1.4vw, 20px)',
+          lineHeight: 1.6,
+          maxWidth: 520,
           margin: '0 0 40px',
           color: 'rgba(255,255,255,0.85)',
         }}>
-          Production audiovisuelle et communication visuelle au service de la prévention des risques professionnels.
+          Vos employés n'écoutent pas les consignes de sécurité. Nous créons les vidéos et supports visuels qui les font vraiment changer de comportement.
         </p>
         <div className="dlm-reveal" style={{ display: 'flex', gap: 16, flexWrap: 'wrap', alignItems: 'center' }}>
-          <button onClick={onDevisOpen} className="dlm-btn-primary" style={{
+          <a href="#services" className="dlm-btn-primary" style={{
             background: DLM.orange,
             color: '#fff',
             padding: '18px 32px',
@@ -718,17 +739,17 @@ function Hero({ bgVariant, onDevisOpen }) {
             fontSize: 15,
             letterSpacing: '0.5px',
             textTransform: 'uppercase',
-            border: 'none',
-            cursor: 'pointer',
+            textDecoration: 'none',
             display: 'inline-flex', alignItems: 'center', gap: 10,
             boxShadow: '0 10px 30px rgba(246,127,0,0.4)',
           }}>
-            Demander un devis
+            Découvrir nos services
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
               <path d="M5 12h14M13 6l6 6-6 6" />
             </svg>
-          </button>
-          <a href="#services" style={{
+          </a>
+          <button onClick={onDevisOpen} style={{
+            background: 'transparent',
             color: '#fff',
             padding: '18px 24px',
             fontFamily: 'Montserrat, sans-serif',
@@ -736,29 +757,36 @@ function Hero({ bgVariant, onDevisOpen }) {
             fontSize: 14,
             letterSpacing: '0.5px',
             textTransform: 'uppercase',
-            textDecoration: 'none',
+            border: 'none',
+            cursor: 'pointer',
             display: 'inline-flex', alignItems: 'center', gap: 10,
             borderBottom: '1px solid rgba(255,255,255,0.3)',
           }}>
-            Voir nos prestations
-          </a>
+            Demander un devis
+          </button>
         </div>
 
         <div className="dlm-reveal" style={{
-          marginTop: 80,
-          display: 'flex', gap: 48, flexWrap: 'wrap',
+          marginTop: 72,
+          display: 'flex', gap: 0, flexWrap: 'wrap',
           paddingTop: 32,
           borderTop: '1px solid rgba(255,255,255,0.15)',
-          maxWidth: 640,
+          maxWidth: 580,
         }}>
           {[
-            { v: '6', l: 'prestations sur mesure' },
-            { v: '100%', l: 'production locale' },
-            { v: '4', l: "secteurs d'intervention" },
+            { icon: '🎬', l: 'Vidéos de sensibilisation SST' },
+            { icon: '📋', l: 'Conseil en prévention terrain' },
+            { icon: '🗺️', l: 'Production 100% locale' },
           ].map((s, i) => (
-            <div key={i}>
-              <div style={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 800, fontSize: 32, color: DLM.orange, lineHeight: 1 }}>{s.v}</div>
-              <div style={{ fontFamily: 'Open Sans, sans-serif', fontSize: 13, color: 'rgba(255,255,255,0.7)', marginTop: 6, maxWidth: 130, lineHeight: 1.3 }}>{s.l}</div>
+            <div key={i} style={{
+              display: 'flex', alignItems: 'center', gap: 10,
+              paddingRight: i < 2 ? 32 : 0,
+              marginRight: i < 2 ? 0 : 0,
+              marginBottom: 12,
+              width: '100%',
+            }}>
+              <span style={{ fontSize: 16, opacity: 0.9 }}>{s.icon}</span>
+              <span style={{ fontFamily: 'Open Sans, sans-serif', fontSize: 13, color: 'rgba(255,255,255,0.75)', lineHeight: 1.3 }}>{s.l}</span>
             </div>
           ))}
         </div>
@@ -984,13 +1012,13 @@ function VideoSection() {
 
       <div style={{ maxWidth: 1280, margin: '0 auto', position: 'relative', zIndex: 2 }}>
         <SectionHeader
-          eyebrow="Notre structure en vidéo"
-          title={<>Découvrez DLM <span style={{ color: DLM.orange }}>en images</span>.</>}
-          desc="Présentation de notre structure, nos services et notre vision de la prévention des risques professionnels."
+          eyebrow="DLM en action"
+          title={<>Ce que nos vidéos <span style={{ color: DLM.orange }}>font vraiment</span>.</>}
+          desc="Chaque production DLM est conçue pour changer un comportement, pas juste informer. Voyez par vous-même."
           invert={true}
         />
 
-        {/* Lecteur vidéo */}
+        {/* Lecteur vidéo principal */}
         <div className="dlm-reveal" style={{ marginTop: 56, maxWidth: 1100, marginLeft: 'auto', marginRight: 'auto' }}>
 
           {/* Conteneur 16:9 */}
@@ -1006,6 +1034,7 @@ function VideoSection() {
             <video
               ref={videoRef}
               src="./videos/Video-Presentation-DLM-YouTube.mp4"
+              poster="./videos/poster-presentation.jpg"
               onClick={toggle}
               style={{
                 position: 'absolute', top: 0, left: 0,
@@ -1025,7 +1054,6 @@ function VideoSection() {
                 cursor: 'pointer',
                 gap: 20,
               }}>
-                {/* Bouton play */}
                 <div style={{
                   width: 88, height: 88, borderRadius: '50%',
                   background: DLM.orange,
@@ -1045,48 +1073,130 @@ function VideoSection() {
               </div>
             )}
 
-            {/* Bouton pause au clic si en lecture */}
             {playing && (
-              <div onClick={toggle} style={{
-                position: 'absolute', inset: 0, cursor: 'pointer',
-              }} />
+              <div onClick={toggle} style={{ position: 'absolute', inset: 0, cursor: 'pointer' }} />
             )}
           </div>
 
-          {/* Bande info sous la vidéo */}
+          {/* Bande info sous la vidéo principale */}
           <div style={{
             background: 'rgba(0,0,0,0.32)',
             backdropFilter: 'blur(12px)',
             border: '1px solid rgba(255,255,255,0.10)',
-            padding: '20px 28px',
+            padding: '18px 28px',
             display: 'flex', justifyContent: 'space-between', alignItems: 'center',
             flexWrap: 'wrap', gap: 16,
-            marginTop: 12,
+            marginTop: 0,
+            borderTop: 'none',
           }}>
             <div>
-              <div style={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 700, fontSize: 16, color: '#fff' }}>
-                Présentation DLM · 43 secondes
+              <div style={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 700, fontSize: 15, color: '#fff' }}>
+                Présentation DLM — 43 secondes
               </div>
-              <div style={{ fontFamily: 'Open Sans, sans-serif', fontSize: 13, color: 'rgba(255,255,255,0.6)', marginTop: 4 }}>
-                Découvre Le Monde · Production audiovisuelle au service de la prévention
+              <div style={{ fontFamily: 'Open Sans, sans-serif', fontSize: 13, color: 'rgba(255,255,255,0.55)', marginTop: 3 }}>
+                Qui sommes-nous, ce que nous faisons, pourquoi ça compte.
               </div>
             </div>
-            <a href="#contact" style={{
+            <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+              <span style={{
+                fontFamily: 'Open Sans, sans-serif', fontSize: 12,
+                color: 'rgba(255,255,255,0.5)', letterSpacing: '1px', textTransform: 'uppercase',
+              }}>Production DLM · 2025</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Carte production — Risques en général */}
+        <div className="dlm-reveal" style={{
+          marginTop: 48,
+          maxWidth: 1100,
+          marginLeft: 'auto',
+          marginRight: 'auto',
+          display: 'grid',
+          gridTemplateColumns: '1fr 1fr',
+          gap: 24,
+        }}>
+          {/* Vignette vidéo */}
+          <div style={{
+            position: 'relative',
+            borderRadius: 4,
+            overflow: 'hidden',
+            boxShadow: '0 16px 48px rgba(0,0,0,0.5)',
+            aspectRatio: '16/9',
+          }}>
+            <img
+              src="./videos/poster-risques.jpg"
+              alt="Les risques professionnels en général — Production DLM"
+              style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+            />
+            <div style={{
+              position: 'absolute', inset: 0,
+              background: 'rgba(0,18,12,0.45)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}>
+              <div style={{
+                width: 60, height: 60, borderRadius: '50%',
+                background: 'rgba(246,127,0,0.85)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                boxShadow: '0 0 0 12px rgba(246,127,0,0.15)',
+              }}>
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="white" style={{ marginLeft: 4 }}>
+                  <path d="M5 3l14 9-14 9z" />
+                </svg>
+              </div>
+            </div>
+            <div style={{
+              position: 'absolute', bottom: 12, left: 14,
               background: DLM.orange,
               color: '#fff',
-              padding: '12px 22px',
-              fontFamily: 'Montserrat, sans-serif', fontWeight: 700, fontSize: 13,
-              letterSpacing: '0.5px', textTransform: 'uppercase',
-              textDecoration: 'none',
-              display: 'inline-flex', alignItems: 'center', gap: 8,
-              boxShadow: '0 6px 20px rgba(246,127,0,0.35)',
-              flexShrink: 0,
+              fontFamily: 'Montserrat, sans-serif', fontWeight: 700, fontSize: 11,
+              letterSpacing: '1px', textTransform: 'uppercase',
+              padding: '4px 10px', borderRadius: 2,
+            }}>Production DLM</div>
+          </div>
+
+          {/* Description de la production */}
+          <div style={{
+            display: 'flex', flexDirection: 'column', justifyContent: 'center',
+            padding: '8px 0',
+          }}>
+            <div style={{
+              fontFamily: 'Montserrat, sans-serif', fontWeight: 700, fontSize: 11,
+              color: DLM.orange, letterSpacing: '2px', textTransform: 'uppercase',
+              marginBottom: 14,
+            }}>Exemple de réalisation</div>
+            <h3 style={{
+              fontFamily: 'Montserrat, sans-serif', fontWeight: 800,
+              fontSize: 'clamp(22px, 2.5vw, 32px)', lineHeight: 1.1,
+              margin: '0 0 16px', letterSpacing: '-0.5px', color: '#fff',
+            }}>Les risques professionnels en général</h3>
+            <p style={{
+              fontFamily: 'Open Sans, sans-serif', fontSize: 15, lineHeight: 1.65,
+              color: 'rgba(255,255,255,0.75)', margin: '0 0 28px',
             }}>
-              Travailler avec nous
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                <path d="M5 12h14M13 6l6 6-6 6" />
-              </svg>
-            </a>
+              Une vidéo de sensibilisation complète sur les risques du quotidien au travail. Tournée en conditions réelles, avec des travailleurs ivoiriens, pour un message qui résonne vraiment.
+            </p>
+            <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', alignItems: 'center' }}>
+              <a href="#contact" style={{
+                background: DLM.orange, color: '#fff',
+                padding: '13px 24px',
+                fontFamily: 'Montserrat, sans-serif', fontWeight: 700, fontSize: 13,
+                letterSpacing: '0.5px', textTransform: 'uppercase',
+                textDecoration: 'none',
+                display: 'inline-flex', alignItems: 'center', gap: 8,
+                boxShadow: '0 6px 20px rgba(246,127,0,0.35)',
+                borderRadius: 3,
+              }}>
+                Nous contacter
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <path d="M5 12h14M13 6l6 6-6 6" />
+                </svg>
+              </a>
+              <span style={{
+                fontFamily: 'Open Sans, sans-serif', fontSize: 12,
+                color: 'rgba(255,255,255,0.45)', letterSpacing: '1px',
+              }}>Durée : 1 min · Terrain ivoirien</span>
+            </div>
           </div>
         </div>
       </div>
@@ -1096,12 +1206,12 @@ function VideoSection() {
 
 function Services() {
   const services = [
-    { icon: 'video', title: 'Vidéos de sensibilisation', desc: 'Messages forts en images pour mobiliser vos équipes sur les risques.', n: '01' },
-    { icon: 'film', title: 'Films documentaires', desc: 'Reportages de terrain pour témoigner et faire évoluer les pratiques.', n: '02' },
-    { icon: 'shield', title: 'Conseil prévention & sécurité', desc: 'Stratégie de communication adaptée à votre culture sécurité.', n: '03' },
-    { icon: 'poster', title: 'Affiches de sensibilisation', desc: 'Visuels percutants pour vos campagnes internes et chantiers.', n: '04' },
-    { icon: 'pictogram', title: 'Pictogrammes de sécurité', desc: 'Signalétique claire, normée et adaptée à vos environnements.', n: '05' },
-    { icon: 'billboard', title: 'Affiches publicitaires', desc: 'Communication grand public à fort impact visuel.', n: '06' },
+    { icon: 'video', title: 'Vidéos de sensibilisation', desc: 'Vos consignes ignorées deviennent des messages que vos équipes regardent, retiennent et appliquent. Format court (1 à 5 min), adapté terrain ivoirien.', n: '01' },
+    { icon: 'film', title: 'Films documentaires', desc: 'Montrez la réalité de vos chantiers et la gravité des risques. Un documentaire crédible convainc là où un discours échoue. Durée 10 à 30 min.', n: '02' },
+    { icon: 'shield', title: 'Conseil prévention & sécurité', desc: 'Vous ne savez pas par où commencer votre communication SST ? Nous analysons vos risques prioritaires et construisons un plan de sensibilisation adapté à vos équipes.', n: '03' },
+    { icon: 'poster', title: 'Affiches de sensibilisation', desc: 'Des visuels clairs et accrocheurs pour vos ateliers, chantiers et espaces de travail. Format A3 ou grand format, livré prêt à imprimer.', n: '04' },
+    { icon: 'pictogram', title: 'Pictogrammes de sécurité', desc: 'Signalétique normée (ISO 7010) adaptée à votre environnement. Vos travailleurs comprennent les consignes d\'un coup d\'œil, même sans lire.', n: '05' },
+    { icon: 'billboard', title: 'Affiches publicitaires', desc: 'Communication grand public pour valoriser votre engagement en prévention. Idéal pour vos partenaires institutionnels et campagnes externes.', n: '06' },
   ];
   return (
     <section id="services" style={{
@@ -1112,8 +1222,8 @@ function Services() {
       <div style={{ maxWidth: 1280, margin: '0 auto' }}>
         <SectionHeader
           eyebrow="Nos prestations"
-          title={<>Six services pour <span style={{ color: DLM.orange }}>prévenir</span>, sensibiliser et convaincre.</>}
-          desc="De la stratégie au film fini, nous concevons des contenus qui font baisser les accidents et changent durablement les comportements."
+          title={<>Ce que DLM <span style={{ color: DLM.orange }}>peut faire</span> pour vous.</>}
+          desc="De l'affiche au film documentaire, chaque livrable est conçu pour un seul objectif : changer le comportement de vos travailleurs face aux risques."
         />
         <div className="dlm-services-grid" style={{
           marginTop: 64,
@@ -1126,6 +1236,41 @@ function Services() {
           {services.map((s, i) => (
             <ServiceCard key={i} {...s} index={i} />
           ))}
+        </div>
+
+        {/* CTA bas de section */}
+        <div className="dlm-reveal" style={{
+          marginTop: 48,
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          flexWrap: 'wrap', gap: 24,
+          padding: '32px 40px',
+          background: DLM.greenDeeper,
+          borderLeft: `4px solid ${DLM.orange}`,
+        }}>
+          <div>
+            <div style={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 700, fontSize: 18, color: '#fff', marginBottom: 6 }}>
+              Vous ne savez pas quelle prestation choisir ?
+            </div>
+            <div style={{ fontFamily: 'Open Sans, sans-serif', fontSize: 14, color: 'rgba(255,255,255,0.65)' }}>
+              Décrivez-nous votre situation en 2 lignes. On vous oriente vers la solution adaptée, sans engagement.
+            </div>
+          </div>
+          <a href="#contact" style={{
+            background: DLM.orange, color: '#fff',
+            padding: '14px 28px',
+            fontFamily: 'Montserrat, sans-serif', fontWeight: 700, fontSize: 13,
+            letterSpacing: '0.5px', textTransform: 'uppercase',
+            textDecoration: 'none',
+            display: 'inline-flex', alignItems: 'center', gap: 10,
+            boxShadow: '0 6px 20px rgba(246,127,0,0.35)',
+            flexShrink: 0,
+            borderRadius: 3,
+          }}>
+            Parler à DLM
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+              <path d="M5 12h14M13 6l6 6-6 6" />
+            </svg>
+          </a>
         </div>
       </div>
     </section>
@@ -1765,17 +1910,36 @@ function Resources() {
       borderTop: `1px solid ${DLM.black}08`,
     }}>
       <div style={{ maxWidth: 1280, margin: '0 auto' }}>
-        <SectionHeader
-          eyebrow="Ressources gratuites"
-          title={<>Téléchargez nos supports de <span style={{ color: DLM.orange }}>sensibilisation</span>.</>}
-          desc="Affiches, fiches pratiques et guides produits par DLM — disponibles gratuitement pour vos équipes et vos affichages."
-        />
+
+        {/* En-tête avec compteur */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: 24 }}>
+          <SectionHeader
+            eyebrow="Bibliothèque DLM"
+            title={<>Supports prêts à l'emploi pour <span style={{ color: DLM.orange }}>vos équipes</span>.</>}
+            desc="Guides techniques, affiches et fiches pratiques produits par DLM. Applicables dès réception dans vos entreprises ivoiriennes."
+          />
+          {!loading && (
+            <div className="dlm-reveal" style={{
+              flexShrink: 0,
+              padding: '14px 24px',
+              background: '#fff',
+              border: `1px solid ${DLM.black}10`,
+              textAlign: 'center',
+            }}>
+              <div style={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 800, fontSize: 28, color: DLM.green, lineHeight: 1 }}>{docs.length}</div>
+              <div style={{ fontFamily: 'Open Sans, sans-serif', fontSize: 12, color: DLM.gray, marginTop: 4, letterSpacing: '1px', textTransform: 'uppercase' }}>
+                {docs.length > 1 ? 'documents disponibles' : 'document disponible'}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Grille documents */}
         <div style={{
-          marginTop: 64,
+          marginTop: 56,
           display: 'grid',
           gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
           gap: 24,
-          maxWidth: 760,
           minHeight: loading ? 120 : 'auto',
         }}>
           {loading ? (
@@ -1783,26 +1947,77 @@ function Resources() {
           ) : docs.map((doc, i) => (
             <DocumentCard key={i} {...doc} />
           ))}
+
+          {/* Carte "Prochainement" */}
+          {!loading && (
+            <div className="dlm-reveal" style={{
+              border: `1.5px dashed ${DLM.black}20`,
+              padding: '32px',
+              display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start',
+              minHeight: 220,
+              background: 'transparent',
+            }}>
+              <div style={{
+                padding: '6px 12px',
+                background: `${DLM.orange}15`,
+                color: DLM.orange,
+                fontFamily: 'Montserrat, sans-serif',
+                fontWeight: 700, fontSize: 11,
+                letterSpacing: '2px', textTransform: 'uppercase',
+                marginBottom: 16,
+              }}>Prochainement</div>
+              <div style={{
+                fontFamily: 'Montserrat, sans-serif', fontWeight: 700,
+                fontSize: 16, color: DLM.black, marginBottom: 10, lineHeight: 1.3,
+              }}>Fiche pratique : Travaux en hauteur</div>
+              <div style={{
+                fontFamily: 'Open Sans, sans-serif', fontSize: 13,
+                color: DLM.gray, lineHeight: 1.5, marginBottom: 20,
+              }}>Checklist terrain pour la prévention des chutes, adaptée aux chantiers ivoiriens.</div>
+              <a href="#contact" style={{
+                fontFamily: 'Montserrat, sans-serif', fontWeight: 600, fontSize: 12,
+                color: DLM.green, textDecoration: 'none', letterSpacing: '0.5px',
+                display: 'inline-flex', alignItems: 'center', gap: 6,
+                borderBottom: `1px solid ${DLM.green}50`,
+                paddingBottom: 2,
+              }}>
+                Me notifier à la sortie
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <path d="M5 12h14M13 6l6 6-6 6" />
+                </svg>
+              </a>
+            </div>
+          )}
         </div>
 
+        {/* Note bas de section */}
         <div className="dlm-reveal" style={{
-          marginTop: 48,
-          padding: '24px 32px',
+          marginTop: 40,
+          padding: '20px 28px',
           background: `${DLM.green}0C`,
           borderLeft: `3px solid ${DLM.green}`,
-          maxWidth: 640,
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          flexWrap: 'wrap', gap: 16,
+          maxWidth: 860,
         }}>
           <p style={{
-            fontFamily: 'Open Sans, sans-serif',
-            fontSize: 14,
-            lineHeight: 1.6,
-            color: DLM.black,
-            margin: 0,
+            fontFamily: 'Open Sans, sans-serif', fontSize: 14,
+            lineHeight: 1.6, color: DLM.black, margin: 0,
           }}>
-            D'autres ressources seront ajoutées régulièrement. Vous avez un besoin spécifique ?{' '}
-            <a href="#contact" style={{ color: DLM.green, fontWeight: 600, textDecoration: 'none' }}>Contactez-nous</a>
-            {' '}pour un support personnalisé.
+            Vous avez besoin d'un support sur un risque spécifique à votre secteur ?
           </p>
+          <a href="#contact" style={{
+            color: DLM.green, fontWeight: 700, fontSize: 13,
+            fontFamily: 'Montserrat, sans-serif', textDecoration: 'none',
+            letterSpacing: '0.5px', textTransform: 'uppercase',
+            display: 'inline-flex', alignItems: 'center', gap: 6,
+            flexShrink: 0,
+          }}>
+            Commander sur mesure
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+              <path d="M5 12h14M13 6l6 6-6 6" />
+            </svg>
+          </a>
         </div>
       </div>
     </section>

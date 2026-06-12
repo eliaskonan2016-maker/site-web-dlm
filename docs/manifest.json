@@ -1,6 +1,17 @@
 {
   "documents": [
     {
+      "source_file": "Guide-Choix-EPI-Chimiques-DLM.pdf",
+      "category": "Guide technique",
+      "title": "Processus de choix des EPI contre les produits chimiques",
+      "desc": "Guide pratique de 30 pages pour sélectionner les bons EPI face aux risques chimiques. 5 étapes de sélection, 6 types d'EPI couverts, 28 points de contrôle terrain. Adapté au contexte ivoirien.",
+      "type": "PDF",
+      "size": "1.0 Mo",
+      "file": "./docs/Guide-Choix-EPI-Chimiques-DLM.pdf",
+      "price": 15000,
+      "added": "2026-06-12"
+    },
+    {
       "source_file": "Affiche-Risques-Chimiques-DLM.pdf",
       "category": "Affiche",
       "title": "Affiche Risques Chimiques",
