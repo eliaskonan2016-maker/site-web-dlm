@@ -1892,16 +1892,30 @@ function DocumentCard({ category, title, desc, type, size, file, price }) {
   );
 }
 
-function Resources() {
-  const [docs, setDocs] = React.useState([]);
-  const [loading, setLoading] = React.useState(true);
+const DOCS_CATALOGUE = [
+  {
+    category: 'Guide technique',
+    title: 'Processus de choix des EPI contre les produits chimiques',
+    desc: 'Guide pratique de 30 pages pour sélectionner les bons EPI face aux risques chimiques. 5 étapes de sélection, 6 types d\'EPI couverts, 28 points de contrôle terrain. Adapté au contexte ivoirien.',
+    type: 'PDF',
+    size: '1.0 Mo',
+    file: './docs/Guide-Choix-EPI-Chimiques-DLM.pdf',
+    price: 15000,
+  },
+  {
+    category: 'Affiche',
+    title: 'Affiche Risques Chimiques',
+    desc: 'Affiche de sensibilisation aux risques liés aux produits chimiques en entreprise. Prête à imprimer et à afficher.',
+    type: 'PDF',
+    size: '4.0 Mo',
+    file: './docs/Affiche-Risques-Chimiques-DLM.pdf',
+    price: 5000,
+  },
+];
 
-  React.useEffect(() => {
-    fetch('./docs/manifest.json?t=' + Date.now())
-      .then(r => r.json())
-      .then(data => { setDocs(data.documents || []); setLoading(false); })
-      .catch(() => setLoading(false));
-  }, []);
+function Resources() {
+  const docs = DOCS_CATALOGUE;
+  const loading = false;
 
   return (
     <section id="ressources" style={{
