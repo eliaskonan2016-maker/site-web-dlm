@@ -2263,13 +2263,8 @@ function DevisModal({ open, onClose }) {
   );
 }
 
-// ─── Configuration CinetPay ─────────────────────────────────────────────────
-// Après création de ton compte sur cinetpay.com, remplace les valeurs ci-dessous
-const CINETPAY = {
-  apikey:  'VOTRE_CLE_API',   // ← coller ta clé API CinetPay ici
-  site_id: 'VOTRE_SITE_ID',  // ← coller ton Site ID CinetPay ici
-  mode:    'TEST',            // ← changer en 'PRODUCTION' au lancement
-};
+// ─── Configuration FedaPay ──────────────────────────────────────────────────
+const FEDAPAY_PUBLIC_KEY = 'pk_live_9oEt6Vsb0hjB1Ll2XGE2eojd';
 // ─────────────────────────────────────────────────────────────────────────────
 
 function PaiementModal({ doc, open, onClose }) {
@@ -2300,10 +2295,10 @@ function PaiementModal({ doc, open, onClose }) {
     setStep('success');
   };
 
-  const chargerCinetPay = () => new Promise((resolve, reject) => {
-    if (window.CinetPay) { resolve(); return; }
+  const chargerFedaPay = () => new Promise((resolve, reject) => {
+    if (window.FedaPay) { resolve(); return; }
     const s = document.createElement('script');
-    s.src = 'https://cdn.cinetpay.com/seamless/main.js';
+    s.src = 'https://cdn.fedapay.com/checkout.js?v=1.1.7';
     s.onload = resolve;
     s.onerror = reject;
     document.head.appendChild(s);
@@ -2312,46 +2307,37 @@ function PaiementModal({ doc, open, onClose }) {
   const handlePay = (e) => {
     e.preventDefault();
     setStep('paying');
-    chargerCinetPay()
+    chargerFedaPay()
     .then(() => {
-    const nomParts = form.nom.trim().split(' ');
-    const prenom = nomParts[0] || '';
-    const nom = nomParts.slice(1).join(' ') || prenom;
+      const nomParts = form.nom.trim().split(' ');
+      const prenom = nomParts[0] || '';
+      const nom = nomParts.slice(1).join(' ') || prenom;
+      const phone = form.telephone.replace(/\D/g, '');
 
-    CinetPay.setConfig({
-      apikey:     CINETPAY.apikey,
-      site_id:    CINETPAY.site_id,
-      notify_url: 'https://decouvrelemonde.com/',
-      mode:       CINETPAY.mode,
-      lang:       'fr',
-    });
+      const widget = FedaPay.init({
+        public_key: FEDAPAY_PUBLIC_KEY,
+        transaction: {
+          amount: doc.price,
+          description: 'Téléchargement : ' + doc.title,
+        },
+        customer: {
+          email: form.email,
+          lastname: nom,
+          firstname: prenom,
+          phone_number: { number: phone, country: 'ci' },
+        },
+        onComplete: function(resp) {
+          if (resp.transaction && resp.transaction.status === 'approved') {
+            triggerDownload();
+          } else if (resp.reason === FedaPay.DIALOG_DISMISSED) {
+            setStep('form');
+          } else {
+            setStep('error');
+          }
+        },
+      });
 
-    CinetPay.getCheckout({
-      transaction_id:          'DLM' + Date.now(),
-      amount:                  doc.price,
-      currency:                'XOF',
-      channels:                'ALL',
-      description:             'Téléchargement : ' + doc.title,
-      customer_name:           nom,
-      customer_surname:        prenom,
-      customer_email:          form.email,
-      customer_phone_number:   form.telephone,
-      customer_address:        'Abidjan',
-      customer_city:           'Abidjan',
-      customer_country:        'CI',
-      customer_state:          'CI',
-      customer_zip_code:       '00000',
-    });
-
-    CinetPay.waitResponse(function(data) {
-      if (data.status === 'ACCEPTED') {
-        triggerDownload();
-      } else {
-        setStep('error');
-      }
-    });
-
-    CinetPay.onError(function() { setStep('error'); });
+      widget.open();
     })
     .catch(() => { setStep('error'); });
   };
@@ -2477,7 +2463,7 @@ function PaiementModal({ doc, open, onClose }) {
                 Paiement en cours…
               </div>
               <div style={{ fontFamily: 'Open Sans, sans-serif', fontSize: 13, color: DLM.gray, marginTop: 8 }}>
-                Complétez le paiement dans la fenêtre CinetPay
+                Complétez le paiement dans la fenêtre FedaPay
               </div>
             </div>
           )}
